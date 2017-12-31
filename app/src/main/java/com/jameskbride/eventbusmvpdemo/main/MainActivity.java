@@ -6,7 +6,7 @@ import com.jameskbride.eventbusmvpdemo.EventBusMVPDemoApplication;
 import javax.inject.Inject;
 
 
-class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
 
     @Inject
     MainActivityImpl delegate;

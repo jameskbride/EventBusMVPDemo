@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.annotation.StringRes;
 import android.widget.Toast;
 
-class ToasterWrapper {
+public class ToasterWrapper {
 
     private Toast toast;
 

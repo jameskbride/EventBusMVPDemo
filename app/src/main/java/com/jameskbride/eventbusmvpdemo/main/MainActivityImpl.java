@@ -43,7 +43,7 @@ public class MainActivityImpl {
 
             @Override public void onResponse(Call<ProfileResponse> call, Response<ProfileResponse> response) {
                 TextView name = mainActivity.findViewById(R.id.customer_name);
-                name.setText(response.body().getFirstName() + response.body().getLastName());
+                name.setText(response.body().getFirstName() + " " + response.body().getLastName());
             }
         });
     }

@@ -5,10 +5,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <android.support.constraint.ConstraintLayout
+    <LinearLayout
         android:id="@+id/name_block"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/first_name_label"
@@ -27,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintRight_toRightOf="@id/spacer" />
-    </android.support.constraint.ConstraintLayout>
+    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
@@ -43,41 +44,29 @@
         <TextView
             android:id="@+id/address_line_1"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="address line 1"/>
+            android:layout_height="wrap_content"/>
 
         <TextView
             android:id="@+id/address_line_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/address_line_1"
-            android:text="address line 2"/>
+            android:layout_below="@id/address_line_1"/>
         <TextView
             android:id="@+id/city"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/address_line_2"
-            android:text="city"/>
+            android:layout_below="@id/address_line_2"/>
         <TextView
             android:id="@+id/state"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/city"
-            android:text="state"/>
+            android:layout_below="@id/city"/>
         <TextView
             android:id="@+id/zipcode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/state"
-            android:text="state"/>
+            android:layout_below="@id/state"/>
 
     </LinearLayout>
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_begin="20dp" />
 
 </LinearLayout>
