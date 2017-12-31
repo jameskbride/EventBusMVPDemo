@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">EventBusMVPDemo</string>
+    <string name="oops">Oops!</string>
 </resources>
