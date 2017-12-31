@@ -5,10 +5,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <android.support.constraint.ConstraintLayout
+    <LinearLayout
         android:id="@+id/name_block"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
 
         <TextView
             android:id="@+id/first_name_label"
@@ -27,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintRight_toRightOf="@id/spacer" />
-    </android.support.constraint.ConstraintLayout>
+    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
@@ -80,6 +82,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/orders"
+            />
         <ListView
             android:id="@+id/order_list"
             android:layout_width="match_parent"
