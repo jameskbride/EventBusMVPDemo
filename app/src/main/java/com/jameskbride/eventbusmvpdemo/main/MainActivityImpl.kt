@@ -28,6 +28,11 @@ class MainActivityImpl @Inject constructor(val burritosToGoApi: BurritosToGoApi,
 
             override fun onResponse(call: Call<ProfileResponse>?, response: Response<ProfileResponse>?) {
                 mainActivity.findViewById<TextView>(R.id.customer_name).text = "${response?.body()?.firstName} ${response?.body()?.lastName}"
+                mainActivity.findViewById<TextView>(R.id.address_line_1).text = response?.body()?.addressLine1
+                mainActivity.findViewById<TextView>(R.id.address_line_2).text = response?.body()?.addressLine2
+                mainActivity.findViewById<TextView>(R.id.city).text = response?.body()?.city
+                mainActivity.findViewById<TextView>(R.id.state).text = response?.body()?.state
+                mainActivity.findViewById<TextView>(R.id.zipcode).text = response?.body()?.zipCode
             }
         })
     }
