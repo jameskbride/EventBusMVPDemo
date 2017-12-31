@@ -3,6 +3,7 @@ package com.jameskbride.eventbusmvpdemo.main
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import com.jameskbride.eventbusmvpdemo.R
@@ -15,7 +16,10 @@ import retrofit2.Callback
 import retrofit2.Response
 import javax.inject.Inject
 
-class MainActivityImpl @Inject constructor(val burritosToGoApi: BurritosToGoApi, val toasterWrapper: ToasterWrapper = ToasterWrapper()) {
+class MainActivityImpl @Inject constructor(
+        val burritosToGoApi: BurritosToGoApi,
+        val toasterWrapper: ToasterWrapper = ToasterWrapper(),
+        val ordersAdapterFactory:OrdersAdapterFactory = OrdersAdapterFactory()) {
 
     fun onCreate(savedInstanceState: Bundle?, mainActivity: MainActivity) {
         mainActivity.setContentView(R.layout.activity_main)
@@ -48,11 +52,13 @@ class MainActivityImpl @Inject constructor(val burritosToGoApi: BurritosToGoApi,
 
     private fun showOrders(orderHistory:List<Order>?, mainActivity: MainActivity) {
         if (orderHistory?.isNotEmpty()!!) {
+            mainActivity.findViewById<LinearLayout>(R.id.found_orders_block).visibility = View.VISIBLE
+            mainActivity.findViewById<LinearLayout>(R.id.no_orders_block).visibility = View.GONE
+            val adapter = ordersAdapterFactory.make(mainActivity, android.R.layout.simple_list_item_1, orderHistory.map { it.description })
+            mainActivity.findViewById<ListView>(R.id.order_list).adapter = adapter
+        } else {
             mainActivity.findViewById<LinearLayout>(R.id.no_orders_block).visibility = View.VISIBLE
             mainActivity.findViewById<LinearLayout>(R.id.found_orders_block).visibility = View.GONE
-        } else {
-            mainActivity.findViewById<LinearLayout>(R.id.no_orders_block).visibility = View.GONE
-            mainActivity.findViewById<LinearLayout>(R.id.found_orders_block).visibility = View.VISIBLE
         }
     }
 }
