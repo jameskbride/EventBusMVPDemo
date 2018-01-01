@@ -10,8 +10,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import javax.inject.Inject
 
-class MainActivityPresenter @Inject constructor(
-        val burritosToGoApi: BurritosToGoApi) {
+class MainActivityPresenter @Inject constructor(val burritosToGoApi: BurritosToGoApi) {
     lateinit var view: MainActivityView
 
     fun getProfile(id: String) {

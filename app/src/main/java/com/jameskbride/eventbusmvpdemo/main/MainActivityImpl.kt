@@ -7,11 +7,9 @@ import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import com.jameskbride.eventbusmvpdemo.R
-import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import com.jameskbride.eventbusmvpdemo.utils.ToasterWrapper
-import retrofit2.Response
 import javax.inject.Inject
 
 class MainActivityImpl @Inject constructor(
