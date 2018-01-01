@@ -20,6 +20,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        delegate.onResume(this)
+        delegate.onResume()
     }
 }
