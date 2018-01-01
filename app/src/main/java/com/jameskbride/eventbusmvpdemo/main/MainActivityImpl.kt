@@ -26,6 +26,7 @@ class MainActivityImpl @Inject constructor(
     }
 
     fun onResume() {
+        presenter.open()
         presenter.getProfile("1")
     }
 
@@ -56,5 +57,9 @@ class MainActivityImpl @Inject constructor(
         mainActivity.findViewById<TextView>(R.id.city).text = response?.city
         mainActivity.findViewById<TextView>(R.id.state).text = response?.state
         mainActivity.findViewById<TextView>(R.id.zipcode).text = response?.zipCode
+    }
+
+    fun onPause() {
+        presenter.close()
     }
 }

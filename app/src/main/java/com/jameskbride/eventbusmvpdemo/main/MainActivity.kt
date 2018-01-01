@@ -22,4 +22,9 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         delegate.onResume()
     }
+
+    override fun onPause() {
+        super.onPause()
+        delegate.onPause()
+    }
 }

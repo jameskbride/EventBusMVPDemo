@@ -67,10 +67,24 @@ class MainActivityImplTest {
     }
 
     @Test
+    fun onResumeOpensThePresenter() {
+        subject.onResume()
+
+        verify(presenter).open()
+    }
+
+    @Test
     fun onResumeRequestsTheProfile() {
         subject.onResume()
 
         verify(presenter).getProfile("1")
+    }
+    
+    @Test
+    fun onPauseClosesThePresenter() {
+        subject.onPause()
+
+        verify(presenter).close()
     }
 
     @Test
