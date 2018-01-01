@@ -24,6 +24,7 @@ class MainActivityImpl @Inject constructor(
     fun onCreate(savedInstanceState: Bundle?, mainActivity: MainActivity) {
         this.mainActivity = mainActivity
         mainActivity.setContentView(R.layout.activity_main)
+        presenter.view = this
     }
 
     fun onResume() {
