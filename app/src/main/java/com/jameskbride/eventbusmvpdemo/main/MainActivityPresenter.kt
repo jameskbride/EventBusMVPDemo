@@ -20,7 +20,7 @@ class MainActivityPresenter @Inject constructor(val burritosToGoApi: BurritosToG
             }
 
             override fun onResponse(call: Call<ProfileResponse>?, response: Response<ProfileResponse>?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                view.displayProfileDetails(response?.body()!!)
             }
 
         })
@@ -29,5 +29,5 @@ class MainActivityPresenter @Inject constructor(val burritosToGoApi: BurritosToG
 
 interface MainActivityView {
     fun displayError(@StringRes message: Int)
-
+    fun displayProfileDetails(profileResponse: ProfileResponse)
 }
