@@ -4,10 +4,12 @@ import com.jameskbride.eventbusmvpdemo.BuildConfig
 import com.jameskbride.eventbusmvpdemo.main.MainActivityImpl
 import com.jameskbride.eventbusmvpdemo.main.MainActivityPresenter
 import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
+import com.jameskbride.eventbusmvpdemo.network.service.BurritosToGoService
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.greenrobot.eventbus.EventBus
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -42,6 +44,18 @@ class ApplicationModule {
     @Singleton
     fun makeBurritosToGoApi(retrofit: Retrofit): BurritosToGoApi {
         return retrofit.create(BurritosToGoApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun makeEventBus():EventBus {
+        return EventBus.getDefault()
+    }
+
+    @Provides
+    @Singleton
+    fun makeBurritosToGoService(eventBus: EventBus, burritosToGoApi: BurritosToGoApi): BurritosToGoService {
+        return BurritosToGoService(eventBus, burritosToGoApi)
     }
 
     @Provides

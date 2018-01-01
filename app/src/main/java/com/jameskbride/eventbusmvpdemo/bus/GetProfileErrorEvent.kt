@@ -1,0 +1,3 @@
+package com.jameskbride.eventbusmvpdemo.bus
+
+class GetProfileErrorEvent

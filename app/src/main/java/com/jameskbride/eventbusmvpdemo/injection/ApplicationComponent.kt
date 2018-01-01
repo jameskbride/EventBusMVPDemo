@@ -1,5 +1,6 @@
 package com.jameskbride.eventbusmvpdemo.injection
 
+import com.jameskbride.eventbusmvpdemo.EventBusMVPDemoApplication
 import com.jameskbride.eventbusmvpdemo.main.MainActivity
 import dagger.Component
 import javax.inject.Singleton
@@ -9,6 +10,7 @@ import javax.inject.Singleton
 @Component(modules = arrayOf(ApplicationModule::class))
 interface ApplicationComponent {
     fun inject(mainActivity: MainActivity)
+    fun inject(application: EventBusMVPDemoApplication)
 }
 
 class ApplicationComponentFactory {
