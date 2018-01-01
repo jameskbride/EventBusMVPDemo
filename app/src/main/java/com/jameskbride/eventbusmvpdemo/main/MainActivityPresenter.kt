@@ -2,34 +2,31 @@ package com.jameskbride.eventbusmvpdemo.main
 
 import android.support.annotation.StringRes
 import com.jameskbride.eventbusmvpdemo.R
+import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent
+import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileResponseEvent
-import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import javax.inject.Inject
 
-class MainActivityPresenter @Inject constructor(val burritosToGoApi: BurritosToGoApi, val eventBus: EventBus) {
+class MainActivityPresenter @Inject constructor(val eventBus: EventBus) {
     lateinit var view: MainActivityView
 
     fun getProfile(id: String) {
-        val call: Call<ProfileResponse> = burritosToGoApi.getProfile(id)
-        call.enqueue(object: Callback<ProfileResponse> {
-            override fun onFailure(call: Call<ProfileResponse>?, t: Throwable?) {
-                view.displayError(R.string.oops)
-            }
+        eventBus.post(GetProfileEvent(id))
+    }
 
-            override fun onResponse(call: Call<ProfileResponse>?, response: Response<ProfileResponse>?) {
-                val profileResponse = response?.body()!!
-                view.displayProfileDetails(profileResponse)
-                val orderHistory = profileResponse.orderHistory
-                displayOrders(orderHistory)
-            }
-        })
+    @Subscribe
+    fun onGetProfileResponseEvent(getProfileResponseEvent: GetProfileResponseEvent) {
+        view.displayProfileDetails(getProfileResponseEvent.profileResponse)
+        displayOrders(getProfileResponseEvent.profileResponse.orderHistory)
+    }
+
+    @Subscribe
+    fun onGetProfileErrorEvent(getProfileErrorEvent: GetProfileErrorEvent) {
+        view.displayError(R.string.oops)
     }
 
     private fun displayOrders(orderHistory: List<Order>) {
@@ -38,11 +35,6 @@ class MainActivityPresenter @Inject constructor(val burritosToGoApi: BurritosToG
         } else {
             view.displayNoOrders()
         }
-    }
-
-    @Subscribe
-    fun onGetProfileResponseEvent(getProfileResponseEvent: GetProfileResponseEvent) {
-
     }
 
     fun open() {

@@ -64,7 +64,7 @@ class ApplicationModule {
     }
 
     @Provides
-    fun makeMainActivityPresenter(burritosToGoApi: BurritosToGoApi, eventBus: EventBus): MainActivityPresenter {
-        return MainActivityPresenter(burritosToGoApi, eventBus)
+    fun makeMainActivityPresenter(eventBus: EventBus): MainActivityPresenter {
+        return MainActivityPresenter(eventBus)
     }
 }

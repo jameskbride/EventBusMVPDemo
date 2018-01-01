@@ -79,7 +79,7 @@ class MainActivityImplTest {
 
         verify(presenter).getProfile("1")
     }
-    
+
     @Test
     fun onPauseClosesThePresenter() {
         subject.onPause()

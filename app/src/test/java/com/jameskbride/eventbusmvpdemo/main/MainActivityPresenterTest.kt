@@ -1,40 +1,46 @@
 package com.jameskbride.eventbusmvpdemo.main
 
-import com.jameskbride.eventbusmvpdemo.FailureCallFake
 import com.jameskbride.eventbusmvpdemo.R
-import com.jameskbride.eventbusmvpdemo.SuccessCallFake
+import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent
+import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent
+import com.jameskbride.eventbusmvpdemo.bus.GetProfileResponseEvent
 import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.whenever
 import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
 import org.junit.After
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations.initMocks
-import retrofit2.Response
-import java.io.IOException
 
 class MainActivityPresenterTest {
 
-    @Mock private lateinit var burritosToGoApi:BurritosToGoApi
     @Mock private lateinit var view:MainActivityView
 
     private lateinit var eventBus:EventBus
 
     private lateinit var subject:MainActivityPresenter
 
+    private lateinit var getProfileEvent: GetProfileEvent
+
     @Before
     fun setUp() {
         initMocks(this)
         eventBus = EventBus.getDefault()
 
-        subject = MainActivityPresenter(burritosToGoApi, eventBus)
+        subject = MainActivityPresenter(eventBus)
         subject.view = view
+
+        eventBus.register(this)
+    }
+
+    @After
+    fun tearDown() {
+        eventBus.unregister(this)
     }
 
     @Test
@@ -57,10 +63,7 @@ class MainActivityPresenterTest {
 
     @Test
     fun itDisplaysAnErrorViewOnFailureOfGetProfile() {
-        val profileResponseCall = FailureCallFake<ProfileResponse>(IOException("parse exception"))
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall)
-
-        subject.getProfile("1")
+        subject.onGetProfileErrorEvent(GetProfileErrorEvent())
 
         verify(view).displayError(R.string.oops)
     }
@@ -68,10 +71,8 @@ class MainActivityPresenterTest {
     @Test
     fun itDisplaysProfileDetailsOnResponseOfGetProfile() {
         val profileResponse = buildProfileResponseWithOrders()
-        val profileResponseCall = SuccessCallFake<ProfileResponse>(Response.success(profileResponse))
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall)
 
-        subject.getProfile("1")
+        subject.onGetProfileResponseEvent(GetProfileResponseEvent(profileResponse))
 
         verify(view).displayProfileDetails(profileResponse)
     }
@@ -79,10 +80,8 @@ class MainActivityPresenterTest {
     @Test
     fun itDisplaysTheOrdersViewOnResponseOfGetProfileWithOrders() {
         val profileResponse = buildProfileResponseWithOrders()
-        val profileResponseCall = SuccessCallFake<ProfileResponse>(Response.success(profileResponse))
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall)
 
-        subject.getProfile("1")
+        subject.onGetProfileResponseEvent(GetProfileResponseEvent(profileResponse))
 
         verify(view).displayOrders(profileResponse.orderHistory)
     }
@@ -90,12 +89,22 @@ class MainActivityPresenterTest {
     @Test
     fun itDisplaysTheNoOrdersFoundViewOnResponseOfGetProfileWithoutOrders() {
         val profileResponse = buildProfileResponseWithoutOrders()
-        val profileResponseCall = SuccessCallFake<ProfileResponse>(Response.success(profileResponse))
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall)
 
-        subject.getProfile("1")
+        subject.onGetProfileResponseEvent(GetProfileResponseEvent(profileResponse))
 
         verify(view).displayNoOrders()
+    }
+
+    @Test
+    fun itCanGetTheProfile() {
+        subject.getProfile("1")
+
+        assertEquals("1", getProfileEvent.id)
+    }
+
+    @Subscribe
+    fun onGetProfileEvent(getProfileEvent:GetProfileEvent) {
+        this.getProfileEvent = getProfileEvent
     }
 
     private fun buildProfileResponseWithoutOrders(): ProfileResponse {
