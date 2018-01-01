@@ -8,6 +8,10 @@ import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
+import org.greenrobot.eventbus.EventBus
+import org.junit.After
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -20,13 +24,35 @@ class MainActivityPresenterTest {
     @Mock private lateinit var burritosToGoApi:BurritosToGoApi
     @Mock private lateinit var view:MainActivityView
 
+    private lateinit var eventBus:EventBus
+
     private lateinit var subject:MainActivityPresenter
 
     @Before
     fun setUp() {
         initMocks(this)
-        subject = MainActivityPresenter(burritosToGoApi)
+        eventBus = EventBus.getDefault()
+
+        subject = MainActivityPresenter(burritosToGoApi, eventBus)
         subject.view = view
+    }
+
+    @Test
+    fun openRegistersWithTheBus() {
+        eventBus.unregister(subject)
+
+        subject.open()
+
+        assertTrue(eventBus.isRegistered(subject))
+    }
+
+    @Test
+    fun closeUnregistersWithTheBus() {
+        eventBus.register(subject)
+
+        subject.close()
+
+        assertFalse(eventBus.isRegistered(subject))
     }
 
     @Test

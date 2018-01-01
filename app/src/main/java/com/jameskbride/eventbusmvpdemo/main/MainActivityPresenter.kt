@@ -2,15 +2,18 @@ package com.jameskbride.eventbusmvpdemo.main
 
 import android.support.annotation.StringRes
 import com.jameskbride.eventbusmvpdemo.R
+import com.jameskbride.eventbusmvpdemo.bus.GetProfileResponseEvent
 import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import javax.inject.Inject
 
-class MainActivityPresenter @Inject constructor(val burritosToGoApi: BurritosToGoApi) {
+class MainActivityPresenter @Inject constructor(val burritosToGoApi: BurritosToGoApi, val eventBus: EventBus) {
     lateinit var view: MainActivityView
 
     fun getProfile(id: String) {
@@ -35,6 +38,19 @@ class MainActivityPresenter @Inject constructor(val burritosToGoApi: BurritosToG
         } else {
             view.displayNoOrders()
         }
+    }
+
+    @Subscribe
+    fun onGetProfileResponseEvent(getProfileResponseEvent: GetProfileResponseEvent) {
+
+    }
+
+    fun open() {
+        eventBus.register(this)
+    }
+
+    fun close() {
+        eventBus.unregister(this)
     }
 }
 
