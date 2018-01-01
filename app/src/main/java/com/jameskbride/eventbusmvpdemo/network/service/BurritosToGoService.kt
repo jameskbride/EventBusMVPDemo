@@ -2,6 +2,7 @@ package com.jameskbride.eventbusmvpdemo.network.service
 
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent
+import com.jameskbride.eventbusmvpdemo.bus.GetProfileResponseEvent
 import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import org.greenrobot.eventbus.EventBus
@@ -20,7 +21,7 @@ class BurritosToGoService @Inject constructor(val eventBus: EventBus, val burrit
             }
 
             override fun onResponse(call: Call<ProfileResponse>?, response: Response<ProfileResponse>?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                eventBus.post(GetProfileResponseEvent(response!!.body()!!))
             }
         })
     }
