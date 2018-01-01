@@ -40,11 +40,23 @@ class BurritosToGoServiceTest {
         subject = BurritosToGoService(eventBus, burritosToGoApi)
 
         eventBus.register(this)
+        subject.open()
     }
 
     @After
     fun tearDown() {
         eventBus.unregister(this)
+        subject.close()
+    }
+
+    @Test
+    fun itRegistersForGetProfileEvent() {
+        val profileResponseCall = FailureCallFake<ProfileResponse>(IOException("parse exception"))
+        whenever(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall)
+
+        eventBus.post(GetProfileEvent("1"))
+
+        assertTrue(getProfileErrorEventFired)
     }
 
     @Test

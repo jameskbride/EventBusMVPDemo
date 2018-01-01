@@ -18,6 +18,8 @@ class EventBusMVPDemoApplication constructor(
         applicationComponent = applicationComponentFactory.build()
         applicationComponent.inject(this)
 
+        burritosToGoService.open()
+
     }
 
     companion object {

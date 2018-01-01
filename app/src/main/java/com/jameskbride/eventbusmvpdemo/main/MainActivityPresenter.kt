@@ -2,6 +2,7 @@ package com.jameskbride.eventbusmvpdemo.main
 
 import android.support.annotation.StringRes
 import com.jameskbride.eventbusmvpdemo.R
+import com.jameskbride.eventbusmvpdemo.bus.BusAware
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileResponseEvent
@@ -11,7 +12,7 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import javax.inject.Inject
 
-class MainActivityPresenter @Inject constructor(val eventBus: EventBus) {
+class MainActivityPresenter @Inject constructor(override val eventBus: EventBus) : BusAware {
     lateinit var view: MainActivityView
 
     fun getProfile(id: String) {
@@ -35,14 +36,6 @@ class MainActivityPresenter @Inject constructor(val eventBus: EventBus) {
         } else {
             view.displayNoOrders()
         }
-    }
-
-    fun open() {
-        eventBus.register(this)
-    }
-
-    fun close() {
-        eventBus.unregister(this)
     }
 }
 
