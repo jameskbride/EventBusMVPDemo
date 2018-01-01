@@ -2,6 +2,7 @@ package com.jameskbride.eventbusmvpdemo.injection
 
 import com.jameskbride.eventbusmvpdemo.BuildConfig
 import com.jameskbride.eventbusmvpdemo.main.MainActivityImpl
+import com.jameskbride.eventbusmvpdemo.main.MainActivityPresenter
 import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
 import dagger.Module
 import dagger.Provides
@@ -46,5 +47,10 @@ class ApplicationModule {
     @Provides
     fun makeMainActivityImpl(burritosToGoApi: BurritosToGoApi): MainActivityImpl {
         return MainActivityImpl(burritosToGoApi)
+    }
+
+    @Provides
+    fun makeMainActivityPresenter(burritosToGoApi: BurritosToGoApi): MainActivityPresenter {
+        return MainActivityPresenter(burritosToGoApi)
     }
 }
