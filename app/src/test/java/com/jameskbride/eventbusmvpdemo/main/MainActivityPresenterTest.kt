@@ -32,7 +32,6 @@ class MainActivityPresenterTest {
     @Test
     fun itDisplaysAnErrorViewOnFailureOfGetProfile() {
         val profileResponseCall = FailureCallFake<ProfileResponse>(IOException("parse exception"))
-
         whenever(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall)
 
         subject.getProfile("1")
@@ -49,6 +48,28 @@ class MainActivityPresenterTest {
         subject.getProfile("1")
 
         verify(view).displayProfileDetails(profileResponse)
+    }
+
+    @Test
+    fun itDisplaysTheOrdersViewOnResponseOfGetProfileWithOrders() {
+        val profileResponse = buildProfileResponseWithOrders()
+        val profileResponseCall = SuccessCallFake<ProfileResponse>(Response.success(profileResponse))
+        whenever(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall)
+
+        subject.getProfile("1")
+
+        verify(view).displayOrders(profileResponse.orderHistory)
+    }
+
+    @Test
+    fun itDisplaysTheNoOrdersFoundViewOnResponseOfGetProfileWithoutOrders() {
+        val profileResponse = buildProfileResponseWithoutOrders()
+        val profileResponseCall = SuccessCallFake<ProfileResponse>(Response.success(profileResponse))
+        whenever(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall)
+
+        subject.getProfile("1")
+
+        verify(view).displayNoOrders()
     }
 
     private fun buildProfileResponseWithoutOrders(): ProfileResponse {

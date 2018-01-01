@@ -3,6 +3,7 @@ package com.jameskbride.eventbusmvpdemo.main
 import android.support.annotation.StringRes
 import com.jameskbride.eventbusmvpdemo.R
 import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
+import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import retrofit2.Call
 import retrofit2.Callback
@@ -20,14 +21,26 @@ class MainActivityPresenter @Inject constructor(val burritosToGoApi: BurritosToG
             }
 
             override fun onResponse(call: Call<ProfileResponse>?, response: Response<ProfileResponse>?) {
-                view.displayProfileDetails(response?.body()!!)
+                val profileResponse = response?.body()!!
+                view.displayProfileDetails(profileResponse)
+                val orderHistory = profileResponse.orderHistory
+                displayOrders(orderHistory)
             }
-
         })
+    }
+
+    private fun displayOrders(orderHistory: List<Order>) {
+        if (orderHistory.isNotEmpty()) {
+            view.displayOrders(orderHistory)
+        } else {
+            view.displayNoOrders()
+        }
     }
 }
 
 interface MainActivityView {
     fun displayError(@StringRes message: Int)
     fun displayProfileDetails(profileResponse: ProfileResponse)
+    fun displayOrders(orderHistory: List<Order>)
+    fun displayNoOrders()
 }
