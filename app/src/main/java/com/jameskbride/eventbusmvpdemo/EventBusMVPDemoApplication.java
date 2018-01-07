@@ -8,6 +8,7 @@ public class EventBusMVPDemoApplication extends Application {
     ApplicationComponentFactory applicationComponentFactory = new ApplicationComponentFactory();
     private ApplicationComponent applicationComponent;
 
+    @Override
     public void onCreate() {
         super.onCreate();
 

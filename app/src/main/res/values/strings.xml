@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">EventBusMVPDemo</string>
     <string name="oops">Oops!</string>
+    <string name="no_orders_found">No orders found.</string>
+    <string name="name_label">Name:</string>
+    <string name="address_label">Address</string>
+    <string name="orders">Orders</string>
 </resources>
