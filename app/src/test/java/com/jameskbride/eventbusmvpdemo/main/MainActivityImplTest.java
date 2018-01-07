@@ -7,10 +7,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.jameskbride.eventbusmvpdemo.FailureCallFake;
 import com.jameskbride.eventbusmvpdemo.R;
-import com.jameskbride.eventbusmvpdemo.SuccessCallFake;
-import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi;
 import com.jameskbride.eventbusmvpdemo.network.Order;
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse;
 import com.jameskbride.eventbusmvpdemo.utils.ToasterWrapper;
@@ -19,13 +16,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Response;
-
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -33,7 +26,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class MainActivityImplTest {
 
     @Mock private MainActivity mainActivity;
-    @Mock private BurritosToGoApi burritosToGoApi;
+    @Mock private MainActivityPresenter presenter;
     @Mock private ToasterWrapper toasterWrapper;
     @Mock private TextView customerName;
     @Mock private TextView addressLine1;
@@ -53,7 +46,7 @@ public class MainActivityImplTest {
     public void setUp() {
         initMocks(this);
 
-        subject = new MainActivityImpl(burritosToGoApi);
+        subject = new MainActivityImpl(presenter);
         subject.toasterWrapper = toasterWrapper;
         subject.ordersAdapterFactory = ordersAdapterFactory;
 
@@ -66,36 +59,37 @@ public class MainActivityImplTest {
         when(mainActivity.findViewById(R.id.no_orders_block)).thenReturn(noOrdersBlock);
         when(mainActivity.findViewById(R.id.found_orders_block)).thenReturn(foundOrdersBlock);
         when(mainActivity.findViewById(R.id.order_list)).thenReturn(orders);
+
+        subject.onCreate(null, mainActivity);
     }
 
     @Test
     public void onCreateSetsTheContentView() {
-        subject.onCreate(null, mainActivity);
-
         verify(mainActivity).setContentView(R.layout.activity_main);
     }
 
     @Test
-    public void onResumeDisplaysAnErrorMessageOnGetProfileFailure() {
-        FailureCallFake<ProfileResponse> profileResponseCall = new FailureCallFake(new IOException("parse exception"));
-
-        when(burritosToGoApi.getProfile(anyString())).thenReturn(profileResponseCall);
+    public void itCanDisplayAnErrorMessage() {
         when(toasterWrapper.makeText(mainActivity, R.string.oops, Toast.LENGTH_LONG)).thenReturn(toasterWrapper);
 
-        subject.onResume(mainActivity);
+        subject.displayError(R.string.oops);
 
         verify(toasterWrapper).makeText(mainActivity, R.string.oops, Toast.LENGTH_LONG);
         verify(toasterWrapper).show();
     }
 
     @Test
-    public void onResumeDisplaysTheProfileDetailsOnGetProfileResponse() {
-        ProfileResponse profileResponse = buildProfileResponseWithoutOrders();
-        SuccessCallFake<ProfileResponse> profileResponseCall = new SuccessCallFake(Response.success(profileResponse));
-
-        when(burritosToGoApi.getProfile(anyString())).thenReturn(profileResponseCall);
-
+    public void onResumeRequestsTheProfile() {
         subject.onResume(mainActivity);
+
+        verify(presenter).getProfile("1");
+    }
+
+    @Test
+    public void itDisplaysTheProfileDetailsOnGetProfileResponse() {
+        ProfileResponse profileResponse = buildProfileResponseWithoutOrders();
+
+        subject.displayProfileDetails(profileResponse);
 
         verify(customerName).setText(profileResponse.getFirstName() + " " + profileResponse.getLastName());
         verify(addressLine1).setText(profileResponse.getAddressLine1());
@@ -106,23 +100,29 @@ public class MainActivityImplTest {
     }
 
     @Test
-    public void onResumeItDisplaysOrdersWhenTheyAreAvailable() {
+    public void itDisplaysOrdersWhenTheyAreAvailable() {
         ProfileResponse profileResponse = buildProfileResponseWithOrders();
-        SuccessCallFake<ProfileResponse> profileResponseCall = new SuccessCallFake(Response.success(profileResponse));
 
-        when(burritosToGoApi.getProfile(anyString())).thenReturn(profileResponseCall);
-        List<String> descriptions = new ArrayList();
+        List<String> descriptions = new ArrayList<>();
         descriptions.add(profileResponse.getOrderHistory().get(0).getDescription());
         when(ordersAdapterFactory.make(
                 mainActivity, android.R.layout.simple_list_item_1,
                 descriptions)).thenReturn(ordersAdapter);
 
-        subject.onResume(mainActivity);
+        subject.displayOrders(profileResponse.getOrderHistory());
 
         verify(foundOrdersBlock).setVisibility(View.VISIBLE);
         verify(noOrdersBlock).setVisibility(View.GONE);
 
         verify(orders).setAdapter(ordersAdapter);
+    }
+
+    @Test
+    public void itDisplaysNoOrdersWhenOrdersAreNotAvailable() {
+        subject.displayNoOrders();
+
+        verify(foundOrdersBlock).setVisibility(View.GONE);
+        verify(noOrdersBlock).setVisibility(View.VISIBLE);
     }
 
     private ProfileResponse buildProfileResponseWithoutOrders() {

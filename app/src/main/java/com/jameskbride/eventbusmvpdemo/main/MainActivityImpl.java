@@ -7,8 +7,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.jameskbride.eventbusmvpdemo.R;
-import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi;
 import com.jameskbride.eventbusmvpdemo.network.Order;
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse;
 import com.jameskbride.eventbusmvpdemo.utils.ToasterWrapper;
@@ -16,84 +16,80 @@ import com.jameskbride.eventbusmvpdemo.utils.ToasterWrapper;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import javax.inject.Inject;
 
-public class MainActivityImpl {
-
-    private BurritosToGoApi burritosToGoApi;
+public class MainActivityImpl implements MainActivityView {
 
     ToasterWrapper toasterWrapper = new ToasterWrapper();
     OrdersAdapterFactory ordersAdapterFactory = new OrdersAdapterFactory();
+    private MainActivityPresenter presenter;
+    private MainActivity mainActivity;
 
     @Inject
-    public MainActivityImpl(BurritosToGoApi burritosToGoApi) {
-        this.burritosToGoApi = burritosToGoApi;
+    public MainActivityImpl(MainActivityPresenter presenter) {
+        this.presenter = presenter;
     }
 
     public void onCreate(Bundle savedInstanceState, MainActivity mainActivity) {
         mainActivity.setContentView(R.layout.activity_main);
+        this.mainActivity = mainActivity;
+        presenter.setView(this);
     }
 
     public void onResume(final MainActivity mainActivity) {
-        final Call<ProfileResponse> call = burritosToGoApi.getProfile("1");
-
-        call.enqueue(new Callback<ProfileResponse>() {
-
-            @Override
-            public void onFailure(Call<ProfileResponse> call, Throwable t) {
-                toasterWrapper.makeText(mainActivity, R.string.oops, Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onResponse(Call<ProfileResponse> call, Response<ProfileResponse> response) {
-                setProfileDetails(mainActivity, response);
-
-                showOrders(response.body().getOrderHistory(), mainActivity);
-            }
-        });
+        presenter.getProfile("1");
     }
 
-    private void setProfileDetails(MainActivity mainActivity, Response<ProfileResponse> response) {
+    @Override
+    public void displayError(int message) {
+        toasterWrapper.makeText(mainActivity, message, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void displayProfileDetails(ProfileResponse response) {
         TextView customerName = mainActivity.findViewById(R.id.customer_name);
-        customerName.setText(response.body().getFirstName() +  " " + response.body().getLastName());
+        customerName.setText(response.getFirstName() +  " " + response.getLastName());
 
         TextView addressLine1 = mainActivity.findViewById(R.id.address_line_1);
-        addressLine1.setText(response.body().getAddressLine1());
+        addressLine1.setText(response.getAddressLine1());
 
         TextView addressLine2 = mainActivity.findViewById(R.id.address_line_2);
-        addressLine2.setText(response.body().getAddressLine2());
+        addressLine2.setText(response.getAddressLine2());
 
         TextView city = mainActivity.findViewById(R.id.city);
-        city.setText(response.body().getCity());
+        city.setText(response.getCity());
 
         TextView state = mainActivity.findViewById(R.id.state);
-        state.setText(response.body().getState());
+        state.setText(response.getState());
 
         TextView zipCode = mainActivity.findViewById(R.id.zipcode);
-        zipCode.setText(response.body().getZipCode());
+        zipCode.setText(response.getZipCode());
     }
 
-    private void showOrders(List<Order> orderHistory, MainActivity mainActivity) {
+    @Override
+    public void displayOrders(List<Order> orderHistory) {
         LinearLayout foundOrdersBlock = mainActivity.findViewById(R.id.found_orders_block);
+        foundOrdersBlock.setVisibility(View.VISIBLE);
+
         LinearLayout noOrdersBlock = mainActivity.findViewById(R.id.no_orders_block);
-        if (!orderHistory.isEmpty()) {
-            foundOrdersBlock.setVisibility(View.VISIBLE);
-            noOrdersBlock.setVisibility(View.GONE);
+        noOrdersBlock.setVisibility(View.GONE);
 
-            List<String> descriptions = new ArrayList<>();
-            for (Order order : orderHistory) {
-                descriptions.add(order.getDescription());
-            }
-
-            ArrayAdapter<String> adapter = ordersAdapterFactory.make(mainActivity, android.R.layout.simple_list_item_1, descriptions);
-            ListView ordersList = mainActivity.findViewById(R.id.order_list);
-            ordersList.setAdapter(adapter);
-        } else {
-            noOrdersBlock.setVisibility(View.VISIBLE);
-            foundOrdersBlock.setVisibility(View.GONE);
+        List<String> descriptions = new ArrayList<>();
+        for (Order order : orderHistory) {
+            descriptions.add(order.getDescription());
         }
+
+        ArrayAdapter<String> adapter = ordersAdapterFactory.make(mainActivity, android.R.layout.simple_list_item_1, descriptions);
+        ListView ordersList = mainActivity.findViewById(R.id.order_list);
+        ordersList.setAdapter(adapter);
+    }
+
+    @Override
+    public void displayNoOrders() {
+        LinearLayout foundOrdersBlock = mainActivity.findViewById(R.id.found_orders_block);
+        foundOrdersBlock.setVisibility(View.GONE);
+
+        LinearLayout noOrdersBlock = mainActivity.findViewById(R.id.no_orders_block);
+        noOrdersBlock.setVisibility(View.VISIBLE);
     }
 }
