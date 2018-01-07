@@ -86,6 +86,20 @@ public class MainActivityImplTest {
     }
 
     @Test
+    public void onResumeOpensThePresenter() {
+        subject.onResume(mainActivity);
+
+        verify(presenter).open();
+    }
+
+    @Test
+    public void onPauseClosesThePresenter() {
+        subject.onPause(mainActivity);
+
+        verify(presenter).close();
+    }
+
+    @Test
     public void itDisplaysTheProfileDetailsOnGetProfileResponse() {
         ProfileResponse profileResponse = buildProfileResponseWithoutOrders();
 

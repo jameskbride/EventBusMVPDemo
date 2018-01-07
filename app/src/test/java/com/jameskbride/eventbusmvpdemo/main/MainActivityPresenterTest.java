@@ -1,47 +1,74 @@
 package com.jameskbride.eventbusmvpdemo.main;
 
-import com.jameskbride.eventbusmvpdemo.FailureCallFake;
+import com.jameskbride.eventbusmvpdemo.GetProfileResponseEvent;
 import com.jameskbride.eventbusmvpdemo.R;
-import com.jameskbride.eventbusmvpdemo.SuccessCallFake;
-import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi;
+import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent;
+import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent;
 import com.jameskbride.eventbusmvpdemo.network.Order;
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Response;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class MainActivityPresenterTest {
 
-    @Mock BurritosToGoApi burritosToGoApi;
     @Mock private MainActivityView view;
 
     MainActivityPresenter subject;
 
+    private EventBus eventBus;
+
+    private GetProfileEvent getProfileEvent;
+
     @Before
     public void setUp() {
         initMocks(this);
-        subject = new MainActivityPresenter(burritosToGoApi);
+        eventBus = EventBus.getDefault();
+        subject = new MainActivityPresenter(eventBus);
         subject.view = view;
+
+        eventBus.register(this);
+    }
+
+    @After
+    public void tearDown() {
+        eventBus.unregister(this);
+    }
+
+    @Test
+    public void openRegistersWithTheBus() {
+        eventBus.unregister(subject);
+
+        subject.open();
+
+        assertTrue(eventBus.isRegistered(subject));
+    }
+
+    @Test
+    public void closeUnregistersWithTheBus() {
+        eventBus.register(subject);
+
+        subject.close();
+
+        assertFalse(eventBus.isRegistered(subject));
     }
 
     @Test
     public void itDisplaysAnErrorViewOnFailureOfGetProfile() {
-        Call<ProfileResponse> profileResponseCall = new FailureCallFake(new IOException("parse exception"));
-        when(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall);
-
-        subject.getProfile("1");
+        subject.onGetProfileErrorEvent(new GetProfileErrorEvent());
 
         verify(view).displayError(R.string.oops);
     }
@@ -49,10 +76,8 @@ public class MainActivityPresenterTest {
     @Test
     public void itDisplaysProfileDetailsOnResponseOfGetProfile() {
         ProfileResponse profileResponse = buildProfileResponseWithOrders();
-        Call<ProfileResponse> profileResponseCall = new SuccessCallFake(Response.success(profileResponse));
-        when(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall);
 
-        subject.getProfile("1");
+        subject.onGetProfileResponseEvent(new GetProfileResponseEvent(profileResponse));
 
         verify(view).displayProfileDetails(profileResponse);
     }
@@ -60,10 +85,8 @@ public class MainActivityPresenterTest {
     @Test
     public void itDisplaysTheOrdersViewOnResponseOfGetProfileWithOrders() {
         ProfileResponse profileResponse = buildProfileResponseWithOrders();
-        Call<ProfileResponse> profileResponseCall = new SuccessCallFake(Response.success(profileResponse));
-        when(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall);
 
-        subject.getProfile("1");
+        subject.onGetProfileResponseEvent(new GetProfileResponseEvent(profileResponse));
 
         verify(view).displayOrders(profileResponse.getOrderHistory());
     }
@@ -71,12 +94,22 @@ public class MainActivityPresenterTest {
     @Test
     public void itDisplaysTheNoOrdersFoundViewOnResponseOfGetProfileWithoutOrders() {
         ProfileResponse profileResponse = buildProfileResponseWithoutOrders();
-        Call<ProfileResponse> profileResponseCall = new SuccessCallFake(Response.success(profileResponse));
-        when(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall);
 
-        subject.getProfile("1");
+        subject.onGetProfileResponseEvent(new GetProfileResponseEvent(profileResponse));
 
         verify(view).displayNoOrders();
+    }
+
+    @Test
+    public void itCanGetTheProfile() {
+        subject.getProfile("1");
+
+        assertEquals("1", getProfileEvent.getId());
+    }
+
+    @Subscribe
+    public void onGetProfileEvent(GetProfileEvent getProfileEvent) {
+        this.getProfileEvent = getProfileEvent;
     }
 
     private ProfileResponse buildProfileResponseWithoutOrders() {

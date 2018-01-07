@@ -24,4 +24,10 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         delegate.onResume(this);
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        delegate.onPause(this);
+    }
 }

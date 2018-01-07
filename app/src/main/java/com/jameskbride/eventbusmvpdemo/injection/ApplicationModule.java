@@ -4,6 +4,9 @@ import com.jameskbride.eventbusmvpdemo.BuildConfig;
 import com.jameskbride.eventbusmvpdemo.main.MainActivityImpl;
 import com.jameskbride.eventbusmvpdemo.main.MainActivityPresenter;
 import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi;
+
+import org.greenrobot.eventbus.EventBus;
+
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
@@ -45,8 +48,14 @@ class ApplicationModule {
     }
 
     @Provides
-    public MainActivityPresenter makeMainActivityPresenter(BurritosToGoApi burritosToGoApi) {
-        return new MainActivityPresenter(burritosToGoApi);
+    @Singleton
+    public EventBus makeEventBus() {
+        return EventBus.getDefault();
+    }
+
+    @Provides
+    public MainActivityPresenter makeMainActivityPresenter(EventBus eventBus) {
+        return new MainActivityPresenter(eventBus);
     }
 
     @Provides

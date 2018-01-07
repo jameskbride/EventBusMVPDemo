@@ -37,7 +37,12 @@ public class MainActivityImpl implements MainActivityView {
     }
 
     public void onResume(final MainActivity mainActivity) {
+        presenter.open();
         presenter.getProfile("1");
+    }
+
+    public void onPause(final MainActivity mainActivity) {
+        presenter.close();
     }
 
     @Override
