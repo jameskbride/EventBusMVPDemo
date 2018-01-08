@@ -1,5 +1,6 @@
 package com.jameskbride.eventbusmvpdemo.main;
 
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
@@ -8,6 +9,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jameskbride.eventbusmvpdemo.R;
+import com.jameskbride.eventbusmvpdemo.bus.NetworkErrorEvent;
+import com.jameskbride.eventbusmvpdemo.bus.NetworkRequestEvent;
+import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFactory;
+import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFragment;
 import com.jameskbride.eventbusmvpdemo.network.Order;
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse;
 import com.jameskbride.eventbusmvpdemo.utils.ToasterWrapper;
@@ -19,6 +24,8 @@ import org.mockito.Mock;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -39,6 +46,10 @@ public class MainActivityImplTest {
     @Mock private ListView orders;
     @Mock private ArrayAdapter<String> ordersAdapter;
     @Mock private OrdersAdapterFactory ordersAdapterFactory;
+    @Mock private View view;
+    @Mock private NetworkErrorViewFragment networkErrorViewFragment;
+    @Mock private NetworkErrorViewFactory networkErrorViewFactory;
+    @Mock private FragmentManager fragmentManager;
 
     private MainActivityImpl subject;
 
@@ -49,6 +60,7 @@ public class MainActivityImplTest {
         subject = new MainActivityImpl(presenter);
         subject.toasterWrapper = toasterWrapper;
         subject.ordersAdapterFactory = ordersAdapterFactory;
+        subject.networkErrorViewFactory = networkErrorViewFactory;
 
         when(mainActivity.findViewById(R.id.customer_name)).thenReturn(customerName);
         when(mainActivity.findViewById(R.id.address_line_1)).thenReturn(addressLine1);
@@ -59,6 +71,8 @@ public class MainActivityImplTest {
         when(mainActivity.findViewById(R.id.no_orders_block)).thenReturn(noOrdersBlock);
         when(mainActivity.findViewById(R.id.found_orders_block)).thenReturn(foundOrdersBlock);
         when(mainActivity.findViewById(R.id.order_list)).thenReturn(orders);
+        when(mainActivity.findViewById(android.R.id.content)).thenReturn(view);
+        when(mainActivity.getSupportFragmentManager()).thenReturn(fragmentManager);
 
         subject.onCreate(null, mainActivity);
     }
@@ -137,6 +151,16 @@ public class MainActivityImplTest {
 
         verify(foundOrdersBlock).setVisibility(View.GONE);
         verify(noOrdersBlock).setVisibility(View.VISIBLE);
+    }
+
+    @Test
+    public void itCanDisplayTheNetworkErrorView() {
+        NetworkRequestEvent networkRequestEvent = new NetworkRequestEvent();
+        when(networkErrorViewFactory.make(networkRequestEvent)).thenReturn(networkErrorViewFragment);
+
+        subject.displayNetworkError(new NetworkErrorEvent(networkRequestEvent));
+
+        verify(networkErrorViewFragment).show(eq(fragmentManager), anyString());
     }
 
     private ProfileResponse buildProfileResponseWithoutOrders() {

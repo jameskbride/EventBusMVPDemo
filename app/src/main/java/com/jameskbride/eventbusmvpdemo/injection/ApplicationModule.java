@@ -4,6 +4,7 @@ import com.jameskbride.eventbusmvpdemo.BuildConfig;
 import com.jameskbride.eventbusmvpdemo.main.MainActivityImpl;
 import com.jameskbride.eventbusmvpdemo.main.MainActivityPresenter;
 import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi;
+import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFactory;
 import com.jameskbride.eventbusmvpdemo.network.service.BurritosToGoService;
 
 import org.greenrobot.eventbus.EventBus;
@@ -81,6 +82,12 @@ class ApplicationModule {
     @Singleton
     public EventBus makeEventBus() {
         return EventBus.getDefault();
+    }
+
+    @Provides
+    @Singleton
+    public NetworkErrorViewFactory makeNetworkErrorViewFactory() {
+        return new NetworkErrorViewFactory();
     }
 
     @Provides

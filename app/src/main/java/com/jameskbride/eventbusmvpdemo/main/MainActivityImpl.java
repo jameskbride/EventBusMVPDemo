@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import com.jameskbride.eventbusmvpdemo.R;
 import com.jameskbride.eventbusmvpdemo.bus.NetworkErrorEvent;
+import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFactory;
+import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFragment;
 import com.jameskbride.eventbusmvpdemo.network.Order;
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse;
 import com.jameskbride.eventbusmvpdemo.utils.ToasterWrapper;
@@ -25,6 +27,9 @@ public class MainActivityImpl implements MainActivityView {
     OrdersAdapterFactory ordersAdapterFactory = new OrdersAdapterFactory();
     private MainActivityPresenter presenter;
     private MainActivity mainActivity;
+
+    @Inject
+    public NetworkErrorViewFactory networkErrorViewFactory;
 
     @Inject
     public MainActivityImpl(MainActivityPresenter presenter) {
@@ -101,6 +106,8 @@ public class MainActivityImpl implements MainActivityView {
 
     @Override
     public void displayNetworkError(NetworkErrorEvent networkErrorEvent) {
-
+        NetworkErrorViewFragment networkErrorViewFragment =
+                networkErrorViewFactory.make(networkErrorEvent.getNetworkRequestEvent());
+        networkErrorViewFragment.show(mainActivity.getSupportFragmentManager(), "networkError");
     }
 }

@@ -1,4 +1,6 @@
 package com.jameskbride.eventbusmvpdemo.bus;
 
-public class NetworkRequestEvent {
+import java.io.Serializable;
+
+public class NetworkRequestEvent implements Serializable {
 }
