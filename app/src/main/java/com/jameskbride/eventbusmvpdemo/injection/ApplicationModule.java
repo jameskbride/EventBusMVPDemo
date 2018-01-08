@@ -7,6 +7,7 @@ import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi;
 import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFactory;
 import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFragment;
 import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFragmentImpl;
+import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewPresenter;
 import com.jameskbride.eventbusmvpdemo.network.service.BurritosToGoService;
 
 import org.greenrobot.eventbus.EventBus;
@@ -103,7 +104,12 @@ class ApplicationModule {
     }
 
     @Provides
-    public NetworkErrorViewFragmentImpl makeNetworkErrorViewFragmentImpl() {
-        return new NetworkErrorViewFragmentImpl();
+    public NetworkErrorViewPresenter makeNetworkErrorViewPresenter(EventBus eventBus) {
+        return new NetworkErrorViewPresenter(eventBus);
+    }
+
+    @Provides
+    public NetworkErrorViewFragmentImpl makeNetworkErrorViewFragmentImpl(NetworkErrorViewPresenter presenter) {
+        return new NetworkErrorViewFragmentImpl(presenter);
     }
 }

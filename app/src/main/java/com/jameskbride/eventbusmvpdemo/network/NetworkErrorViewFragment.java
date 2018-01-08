@@ -13,6 +13,8 @@ import javax.inject.Inject;
 
 public class NetworkErrorViewFragment extends DialogFragment {
 
+    public static final String NETWORK_REQUEST = "NETWORK_REQUEST";
+
     @Inject
     NetworkErrorViewFragmentImpl delegate;
 

@@ -4,8 +4,9 @@ import android.os.Bundle;
 
 import com.jameskbride.eventbusmvpdemo.bus.NetworkRequestEvent;
 
+import static com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFragment.NETWORK_REQUEST;
+
 public class NetworkErrorViewFactory {
-    private static final String NETWORK_REQUEST = "NETWORK_REQUEST";
 
     public NetworkErrorViewFragment make(NetworkRequestEvent networkRequestEvent) {
         Bundle bundle = new Bundle();
