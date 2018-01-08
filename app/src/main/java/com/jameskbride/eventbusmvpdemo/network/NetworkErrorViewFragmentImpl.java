@@ -7,12 +7,13 @@ import android.view.ViewGroup;
 
 import com.jameskbride.eventbusmvpdemo.R;
 import com.jameskbride.eventbusmvpdemo.bus.NetworkRequestEvent;
+import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewPresenter.NetworkErrorView;
 
 import javax.inject.Inject;
 
 import static com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFragment.NETWORK_REQUEST;
 
-public class NetworkErrorViewFragmentImpl {
+public class NetworkErrorViewFragmentImpl implements NetworkErrorView{
 
     private NetworkErrorViewPresenter presenter;
 
@@ -33,5 +34,18 @@ public class NetworkErrorViewFragmentImpl {
         });
 
         return view;
+    }
+
+    public void onResume(NetworkErrorViewFragment networkErrorViewFragment) {
+        presenter.open();
+    }
+
+    public void onPause(NetworkErrorViewFragment networkErrorViewFragment) {
+        presenter.close();
+    }
+
+    @Override
+    public void dismiss() {
+
     }
 }

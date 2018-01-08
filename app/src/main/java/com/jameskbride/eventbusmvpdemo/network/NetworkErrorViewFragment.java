@@ -25,4 +25,17 @@ public class NetworkErrorViewFragment extends DialogFragment {
 
         return delegate.onCreateView(inflater, container, savedInstanceState, this);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        delegate.onResume(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        delegate.onPause(this);
+    }
 }
