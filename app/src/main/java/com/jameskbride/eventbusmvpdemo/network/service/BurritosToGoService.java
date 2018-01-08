@@ -33,12 +33,6 @@ public class BurritosToGoService extends BusAware {
     @Subscribe
     public void onGetProfileEvent(GetProfileEvent getProfileEvent) {
         Observable<ProfileResponse> call = burritosToGoApi.getProfile(getProfileEvent.getId());
-        Consumer<Throwable> onError = new Consumer<Throwable>() {
-            @Override
-            public void accept(Throwable throwable) throws Exception {
-                bus.post(new GetProfileErrorEvent());
-            }
-        };
         call
             .subscribeOn(processScheduler)
             .observeOn(androidScheduler)
@@ -49,7 +43,12 @@ public class BurritosToGoService extends BusAware {
                                bus.post(new GetProfileResponseEvent(response));
                            }
                        },
-                    new NetworkApiWrapper(bus, onError, getProfileEvent)
+                    new NetworkApiWrapper(bus, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            bus.post(new GetProfileErrorEvent());
+                        }
+                    }, getProfileEvent)
             );
     }
 }

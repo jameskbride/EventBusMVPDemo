@@ -25,11 +25,11 @@ public class MainActivityImpl implements MainActivityView {
 
     ToasterWrapper toasterWrapper = new ToasterWrapper();
     OrdersAdapterFactory ordersAdapterFactory = new OrdersAdapterFactory();
-    private MainActivityPresenter presenter;
-    private MainActivity mainActivity;
+    NetworkErrorViewFactory networkErrorViewFactory = new NetworkErrorViewFactory();
 
-    @Inject
-    public NetworkErrorViewFactory networkErrorViewFactory;
+    private MainActivityPresenter presenter;
+
+    private MainActivity mainActivity;
 
     @Inject
     public MainActivityImpl(MainActivityPresenter presenter) {

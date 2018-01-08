@@ -61,6 +61,7 @@ public class MainActivityPresenter extends BusAware {
         this.view = view;
     }
 
+    @Subscribe
     public void onNetworkErrorEvent(NetworkErrorEvent networkErrorEvent) {
         view.displayNetworkError(networkErrorEvent);
     }

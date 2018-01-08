@@ -5,6 +5,8 @@ import com.jameskbride.eventbusmvpdemo.main.MainActivityImpl;
 import com.jameskbride.eventbusmvpdemo.main.MainActivityPresenter;
 import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi;
 import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFactory;
+import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFragment;
+import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFragmentImpl;
 import com.jameskbride.eventbusmvpdemo.network.service.BurritosToGoService;
 
 import org.greenrobot.eventbus.EventBus;
@@ -98,5 +100,10 @@ class ApplicationModule {
     @Provides
     public MainActivityImpl makeMainActivityImpl(MainActivityPresenter presenter) {
         return new MainActivityImpl(presenter);
+    }
+
+    @Provides
+    public NetworkErrorViewFragmentImpl makeNetworkErrorViewFragmentImpl() {
+        return new NetworkErrorViewFragmentImpl();
     }
 }
