@@ -7,6 +7,7 @@ import com.jameskbride.eventbusmvpdemo.R;
 import com.jameskbride.eventbusmvpdemo.bus.BusAware;
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent;
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent;
+import com.jameskbride.eventbusmvpdemo.bus.NetworkErrorEvent;
 import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi;
 import com.jameskbride.eventbusmvpdemo.network.Order;
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse;
@@ -59,6 +60,10 @@ public class MainActivityPresenter extends BusAware {
     public void setView(MainActivityView view) {
         this.view = view;
     }
+
+    public void onNetworkErrorEvent(NetworkErrorEvent networkErrorEvent) {
+        view.displayNetworkError(networkErrorEvent);
+    }
 }
 
 interface MainActivityView {
@@ -66,4 +71,5 @@ interface MainActivityView {
     void displayProfileDetails(ProfileResponse profileResponse);
     void displayOrders(List<Order> orderHistory);
     void displayNoOrders();
+    void displayNetworkError(NetworkErrorEvent networkErrorEvent);
 }

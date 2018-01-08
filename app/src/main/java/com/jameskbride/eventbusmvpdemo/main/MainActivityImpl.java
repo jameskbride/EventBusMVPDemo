@@ -9,6 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jameskbride.eventbusmvpdemo.R;
+import com.jameskbride.eventbusmvpdemo.bus.NetworkErrorEvent;
 import com.jameskbride.eventbusmvpdemo.network.Order;
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse;
 import com.jameskbride.eventbusmvpdemo.utils.ToasterWrapper;
@@ -96,5 +97,10 @@ public class MainActivityImpl implements MainActivityView {
 
         LinearLayout noOrdersBlock = mainActivity.findViewById(R.id.no_orders_block);
         noOrdersBlock.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void displayNetworkError(NetworkErrorEvent networkErrorEvent) {
+
     }
 }

@@ -4,6 +4,7 @@ import com.jameskbride.eventbusmvpdemo.GetProfileResponseEvent;
 import com.jameskbride.eventbusmvpdemo.R;
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent;
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent;
+import com.jameskbride.eventbusmvpdemo.bus.NetworkErrorEvent;
 import com.jameskbride.eventbusmvpdemo.network.Order;
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse;
 
@@ -105,6 +106,14 @@ public class MainActivityPresenterTest {
         subject.getProfile("1");
 
         assertEquals("1", getProfileEvent.getId());
+    }
+
+    @Test
+    public void itDisplaysTheNetworkErrorViewWhenANetworkErrorEventIsReceived() {
+        NetworkErrorEvent networkErrorEvent = new NetworkErrorEvent(new GetProfileEvent("1"));
+        subject.onNetworkErrorEvent(networkErrorEvent);
+
+        verify(view).displayNetworkError(networkErrorEvent);
     }
 
     @Subscribe
