@@ -9,6 +9,8 @@ import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import com.nhaarman.mockito_kotlin.whenever
+import io.reactivex.Observable
+import io.reactivex.schedulers.TestScheduler
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.junit.After
@@ -28,6 +30,7 @@ class BurritosToGoServiceTest {
     private lateinit var subject:BurritosToGoService
 
     private lateinit var eventBus:EventBus
+    private lateinit var testScheduler:TestScheduler
 
     private var getProfileErrorEventFired: Boolean = false
     private lateinit var getProfileResponseEvent: GetProfileResponseEvent
@@ -36,8 +39,9 @@ class BurritosToGoServiceTest {
     fun setUp() {
         initMocks(this)
         eventBus = EventBus.getDefault()
+        testScheduler = TestScheduler()
 
-        subject = BurritosToGoService(eventBus, burritosToGoApi)
+        subject = BurritosToGoService(eventBus, burritosToGoApi, testScheduler, testScheduler)
 
         eventBus.register(this)
         subject.open()
@@ -51,20 +55,20 @@ class BurritosToGoServiceTest {
 
     @Test
     fun itRegistersForGetProfileEvent() {
-        val profileResponseCall = FailureCallFake<ProfileResponse>(IOException("parse exception"))
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall)
+        whenever(burritosToGoApi.getProfile("1")).thenReturn(Observable.error(IOException("parse exception")))
 
         eventBus.post(GetProfileEvent("1"))
+        testScheduler.triggerActions()
 
         assertTrue(getProfileErrorEventFired)
     }
 
     @Test
     fun onGetProfileEventEmitsGetProfileErrorWhenAFailureOccurs() {
-        val profileResponseCall = FailureCallFake<ProfileResponse>(IOException("parse exception"))
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall)
+        whenever(burritosToGoApi.getProfile("1")).thenReturn(Observable.error(IOException("parse exception")))
 
         subject.onGetProfileEvent(GetProfileEvent("1"))
+        testScheduler.triggerActions()
 
         assertTrue(getProfileErrorEventFired)
     }
@@ -72,10 +76,11 @@ class BurritosToGoServiceTest {
     @Test
     fun onGetProfileEventEmitsGetProfileResponseEventWhenAResponseIsReceived() {
         val profileResponse = buildProfileResponseWithOrders()
-        val profileResponseCall = SuccessCallFake<ProfileResponse>(Response.success(profileResponse))
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall)
+        val observable = Observable.just(profileResponse)
+        whenever(burritosToGoApi.getProfile("1")).thenReturn(observable)
 
         subject.onGetProfileEvent(GetProfileEvent("1"))
+        testScheduler.triggerActions()
 
         assertEquals(profileResponse, getProfileResponseEvent.profileResponse)
     }
