@@ -1,8 +1,10 @@
 package com.jameskbride.eventbusmvpdemo.network.service;
 
+import com.google.gson.Gson;
 import com.jameskbride.eventbusmvpdemo.GetProfileResponseEvent;
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent;
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent;
+import com.jameskbride.eventbusmvpdemo.bus.NetworkErrorEvent;
 import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi;
 import com.jameskbride.eventbusmvpdemo.network.Order;
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse;
@@ -20,8 +22,15 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.schedulers.TestScheduler;
+import okhttp3.MediaType;
+import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.HttpException;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -37,6 +46,7 @@ public class BurritosToGoServiceTest {
 
     private boolean getProfileErrorEventFired;
     private GetProfileResponseEvent getProfileResponseEvent;
+    private boolean networkErrorEventfired;
 
     @Before
     public void setUp() {
@@ -58,19 +68,33 @@ public class BurritosToGoServiceTest {
 
     @Test
     public void itRegistersForGetProfileEvent() {
+        ProfileResponse profileResponse = buildProfileResponseWithOrders();
+        when(burritosToGoApi.getProfile("1")).thenReturn(Observable.just(profileResponse));
+
+        eventBus.post(new GetProfileEvent("1"));
+        testScheduler.triggerActions();
+
+        assertNotNull(getProfileResponseEvent);
+    }
+
+    @Test
+    public void itPostsANetworkErrorEventWhenAnIOExceptionOccurs() {
         IOException throwable = new IOException("parse exception");
         when(burritosToGoApi.getProfile("1")).thenReturn(Observable.<ProfileResponse>error(throwable));
 
         eventBus.post(new GetProfileEvent("1"));
         testScheduler.triggerActions();
 
-        assertTrue(getProfileErrorEventFired);
+        assertTrue(networkErrorEventfired);
     }
 
     @Test
     public void onGetProfileEventEmitsGetProfileErrorWhenAFailureOccurs() {
-        IOException throwable = new IOException("parse exception");
-        when(burritosToGoApi.getProfile("1")).thenReturn(Observable.<ProfileResponse>error(throwable));
+        Gson gson = new Gson();
+        gson.toJson(new CustomError());
+        Response<Object> throwable = Response.error(400, ResponseBody.create(MediaType.parse("application/json"), gson.toString()));
+        HttpException exception = new HttpException(throwable);
+        when(burritosToGoApi.getProfile("1")).thenReturn(Observable.<ProfileResponse>error(exception));
 
         subject.onGetProfileEvent(new GetProfileEvent("1"));
         testScheduler.triggerActions();
@@ -100,6 +124,11 @@ public class BurritosToGoServiceTest {
         this.getProfileResponseEvent = getProfileResponseEvent;
     }
 
+    @Subscribe
+    public void onNetworkErrorEvent(NetworkErrorEvent networkErrorEvent) {
+        networkErrorEventfired = true;
+    }
+
     private ProfileResponse buildProfileResponseWithOrders() {
         List<Order> orders = new ArrayList<>();
         orders.add(new Order(1, "description"));
@@ -114,5 +143,9 @@ public class BurritosToGoServiceTest {
                 orders
         );
         return profileResponse;
+    }
+
+    private static class CustomError {
+
     }
 }

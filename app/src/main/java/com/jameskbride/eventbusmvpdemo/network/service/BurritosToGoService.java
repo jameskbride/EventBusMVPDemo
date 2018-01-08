@@ -5,6 +5,7 @@ import com.jameskbride.eventbusmvpdemo.bus.BusAware;
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent;
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent;
 import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi;
+import com.jameskbride.eventbusmvpdemo.network.NetworkApiWrapper;
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse;
 
 import org.greenrobot.eventbus.EventBus;
@@ -32,6 +33,12 @@ public class BurritosToGoService extends BusAware {
     @Subscribe
     public void onGetProfileEvent(GetProfileEvent getProfileEvent) {
         Observable<ProfileResponse> call = burritosToGoApi.getProfile(getProfileEvent.getId());
+        Consumer<Throwable> onError = new Consumer<Throwable>() {
+            @Override
+            public void accept(Throwable throwable) throws Exception {
+                bus.post(new GetProfileErrorEvent());
+            }
+        };
         call
             .subscribeOn(processScheduler)
             .observeOn(androidScheduler)
@@ -42,12 +49,7 @@ public class BurritosToGoService extends BusAware {
                                bus.post(new GetProfileResponseEvent(response));
                            }
                        },
-                    new Consumer<Throwable>() {
-                        @Override
-                        public void accept(Throwable throwable) throws Exception {
-                            bus.post(new GetProfileErrorEvent());
-                        }
-                    }
+                    new NetworkApiWrapper(bus, onError, getProfileEvent)
             );
     }
 }

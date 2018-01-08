@@ -1,6 +1,6 @@
 package com.jameskbride.eventbusmvpdemo.bus;
 
-public class GetProfileEvent {
+public class GetProfileEvent extends NetworkRequestEvent {
 
     private String id;
 
