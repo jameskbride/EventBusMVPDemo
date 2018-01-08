@@ -16,6 +16,7 @@ import static com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFragment.N
 public class NetworkErrorViewFragmentImpl implements NetworkErrorView{
 
     private NetworkErrorViewPresenter presenter;
+    private NetworkErrorViewFragment networkErrorViewFragment;
 
     @Inject
     public NetworkErrorViewFragmentImpl(NetworkErrorViewPresenter presenter) {
@@ -23,7 +24,9 @@ public class NetworkErrorViewFragmentImpl implements NetworkErrorView{
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState, final NetworkErrorViewFragment networkErrorViewFragment) {
+        this.networkErrorViewFragment = networkErrorViewFragment;
         View view = inflater.inflate(R.layout.network_error, container);
+        presenter.view = this;
 
         view.findViewById(R.id.retry_button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -37,15 +40,13 @@ public class NetworkErrorViewFragmentImpl implements NetworkErrorView{
     }
 
     public void onResume(NetworkErrorViewFragment networkErrorViewFragment) {
-        presenter.open();
     }
 
     public void onPause(NetworkErrorViewFragment networkErrorViewFragment) {
-        presenter.close();
     }
 
     @Override
     public void dismiss() {
-
+        networkErrorViewFragment.dismiss();
     }
 }

@@ -73,17 +73,9 @@ public class NetworkErrorViewFragmentImplTest {
     }
 
     @Test
-    public void onResumeOpensThePresenter() {
-        subject.onResume(networkErrorViewFragment);
+    public void itCanDismissTheDialog() {
+        subject.dismiss();
 
-        verify(presenter).open();
+        verify(networkErrorViewFragment).dismiss();
     }
-
-    @Test
-    public void onPauseOpensThePresenter() {
-        subject.onPause(networkErrorViewFragment);
-
-        verify(presenter).close();
-    }
-
 }
