@@ -12,30 +12,42 @@ import org.greenrobot.eventbus.Subscribe;
 
 import javax.inject.Inject;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
+import io.reactivex.functions.Consumer;
 
 public class BurritosToGoService extends BusAware {
     private final BurritosToGoApi burritosToGoApi;
+    private final Scheduler processScheduler;
+    private final Scheduler androidScheduler;
 
     @Inject
-    public BurritosToGoService(EventBus bus, BurritosToGoApi burritosToGoApi) {
+    public BurritosToGoService(EventBus bus, BurritosToGoApi burritosToGoApi, Scheduler processScheduler, Scheduler androidScheduler) {
         super(bus);
         this.burritosToGoApi = burritosToGoApi;
+        this.processScheduler = processScheduler;
+        this.androidScheduler = androidScheduler;
     }
 
     @Subscribe
     public void onGetProfileEvent(GetProfileEvent getProfileEvent) {
-        Call<ProfileResponse> call = burritosToGoApi.getProfile(getProfileEvent.getId());
-        call.enqueue(new Callback<ProfileResponse>() {
-            @Override public void onFailure(Call<ProfileResponse> call, Throwable throwable) {
-                bus.post(new GetProfileErrorEvent());
-            }
-
-            @Override public void onResponse(Call<ProfileResponse> call, Response<ProfileResponse> response) {
-                bus.post(new GetProfileResponseEvent(response.body()));
-            }
-        });
+        Observable<ProfileResponse> call = burritosToGoApi.getProfile(getProfileEvent.getId());
+        call
+            .subscribeOn(processScheduler)
+            .observeOn(androidScheduler)
+            .subscribe(
+                    new Consumer<ProfileResponse>() {
+                           @Override
+                           public void accept(ProfileResponse response) throws Exception {
+                               bus.post(new GetProfileResponseEvent(response));
+                           }
+                       },
+                    new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            bus.post(new GetProfileErrorEvent());
+                        }
+                    }
+            );
     }
 }

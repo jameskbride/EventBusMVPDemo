@@ -1,8 +1,6 @@
 package com.jameskbride.eventbusmvpdemo.network.service;
 
-import com.jameskbride.eventbusmvpdemo.FailureCallFake;
 import com.jameskbride.eventbusmvpdemo.GetProfileResponseEvent;
-import com.jameskbride.eventbusmvpdemo.SuccessCallFake;
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent;
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent;
 import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi;
@@ -20,8 +18,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Response;
+import io.reactivex.Observable;
+import io.reactivex.schedulers.TestScheduler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -35,6 +33,7 @@ public class BurritosToGoServiceTest {
     private BurritosToGoService subject;
 
     private EventBus eventBus;
+    private TestScheduler testScheduler;
 
     private boolean getProfileErrorEventFired;
     private GetProfileResponseEvent getProfileResponseEvent;
@@ -43,8 +42,9 @@ public class BurritosToGoServiceTest {
     public void setUp() {
         initMocks(this);
         eventBus = EventBus.getDefault();
+        testScheduler = new TestScheduler();
 
-        subject = new BurritosToGoService(eventBus, burritosToGoApi);
+        subject = new BurritosToGoService(eventBus, burritosToGoApi, testScheduler, testScheduler);
 
         eventBus.register(this);
         subject.open();
@@ -58,20 +58,22 @@ public class BurritosToGoServiceTest {
 
     @Test
     public void itRegistersForGetProfileEvent() {
-        Call<ProfileResponse> profileResponseCall = new FailureCallFake(new IOException("parse exception"));
-        when(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall);
+        IOException throwable = new IOException("parse exception");
+        when(burritosToGoApi.getProfile("1")).thenReturn(Observable.<ProfileResponse>error(throwable));
 
         eventBus.post(new GetProfileEvent("1"));
+        testScheduler.triggerActions();
 
         assertTrue(getProfileErrorEventFired);
     }
 
     @Test
     public void onGetProfileEventEmitsGetProfileErrorWhenAFailureOccurs() {
-        Call<ProfileResponse> profileResponseCall = new FailureCallFake(new IOException("parse exception"));
-        when(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall);
+        IOException throwable = new IOException("parse exception");
+        when(burritosToGoApi.getProfile("1")).thenReturn(Observable.<ProfileResponse>error(throwable));
 
         subject.onGetProfileEvent(new GetProfileEvent("1"));
+        testScheduler.triggerActions();
 
         assertTrue(getProfileErrorEventFired);
     }
@@ -79,10 +81,11 @@ public class BurritosToGoServiceTest {
     @Test
     public void onGetProfileEventEmitsGetProfileResponseEventWhenAResponseIsReceived() {
         ProfileResponse profileResponse = buildProfileResponseWithOrders();
-        Call<ProfileResponse> profileResponseCall = new SuccessCallFake(Response.success(profileResponse));
-        when(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall);
+        Observable<ProfileResponse> observable = Observable.just(profileResponse);
+        when(burritosToGoApi.getProfile("1")).thenReturn(observable);
 
         subject.onGetProfileEvent(new GetProfileEvent("1"));
+        testScheduler.triggerActions();
 
         assertEquals(profileResponse, getProfileResponseEvent.getProfileResponse());
     }
