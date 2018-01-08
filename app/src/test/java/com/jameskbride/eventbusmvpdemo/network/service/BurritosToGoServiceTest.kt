@@ -1,7 +1,5 @@
 package com.jameskbride.eventbusmvpdemo.network.service
 
-import com.jameskbride.eventbusmvpdemo.FailureCallFake
-import com.jameskbride.eventbusmvpdemo.SuccessCallFake
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileResponseEvent
@@ -20,7 +18,6 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations.initMocks
-import retrofit2.Response
 import java.io.IOException
 
 class BurritosToGoServiceTest {
