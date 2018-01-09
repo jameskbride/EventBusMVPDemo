@@ -3,6 +3,7 @@ package com.jameskbride.eventbusmvpdemo.network.service
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileResponseEvent
+import com.jameskbride.eventbusmvpdemo.bus.NetworkErrorEvent
 import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
@@ -12,13 +13,17 @@ import io.reactivex.schedulers.TestScheduler
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations.initMocks
 import java.io.IOException
+import okhttp3.ResponseBody
+import com.google.gson.Gson
+import okhttp3.MediaType
+import org.junit.Assert.*
+import retrofit2.HttpException
+import retrofit2.Response
 
 class BurritosToGoServiceTest {
 
@@ -31,6 +36,7 @@ class BurritosToGoServiceTest {
 
     private var getProfileErrorEventFired: Boolean = false
     private lateinit var getProfileResponseEvent: GetProfileResponseEvent
+    private var networkErrorEventfired: Boolean = false
 
     @Before
     fun setUp() {
@@ -52,18 +58,21 @@ class BurritosToGoServiceTest {
 
     @Test
     fun itRegistersForGetProfileEvent() {
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(Observable.error(IOException("parse exception")))
-
+        val profileResponse = buildProfileResponseWithOrders()
+        whenever(burritosToGoApi.getProfile("1")).thenReturn(Observable.just(profileResponse))
         eventBus.post(GetProfileEvent("1"))
         testScheduler.triggerActions()
 
-        assertTrue(getProfileErrorEventFired)
+        assertNotNull(getProfileResponseEvent)
     }
 
     @Test
     fun onGetProfileEventEmitsGetProfileErrorWhenAFailureOccurs() {
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(Observable.error(IOException("parse exception")))
-
+        val gson = Gson()
+        gson.toJson(CustomError())
+        val throwable = Response.error<ProfileResponse>(400, ResponseBody.create(MediaType.parse("application/json"), gson.toString()))
+        val exception = HttpException(throwable)
+        whenever(burritosToGoApi.getProfile("1")).thenReturn(Observable.error<ProfileResponse>(exception))
         subject.onGetProfileEvent(GetProfileEvent("1"))
         testScheduler.triggerActions()
 
@@ -82,6 +91,17 @@ class BurritosToGoServiceTest {
         assertEquals(profileResponse, getProfileResponseEvent.profileResponse)
     }
 
+    @Test
+    fun itPostsANetworkErrorEventWhenAnIOExceptionOccurs() {
+        val throwable = IOException("parse exception")
+        whenever(burritosToGoApi.getProfile("1")).thenReturn(Observable.error<ProfileResponse>(throwable))
+
+        eventBus.post(GetProfileEvent("1"))
+        testScheduler.triggerActions()
+
+        assertTrue(networkErrorEventfired)
+    }
+
     @Subscribe
     fun onGetProfileErrorEvent(getProfileErrorEvent: GetProfileErrorEvent){
         getProfileErrorEventFired = true
@@ -90,6 +110,11 @@ class BurritosToGoServiceTest {
     @Subscribe
     fun onGetProfileResponseEvent(getProfileResponseEvent: GetProfileResponseEvent) {
         this.getProfileResponseEvent = getProfileResponseEvent
+    }
+
+    @Subscribe
+    fun onNetworkErrorEvent(networkErrorEvent: NetworkErrorEvent) {
+        networkErrorEventfired = true
     }
 
     private fun buildProfileResponseWithoutOrders(): ProfileResponse {
@@ -119,3 +144,5 @@ class BurritosToGoServiceTest {
         )
     }
 }
+
+class CustomError

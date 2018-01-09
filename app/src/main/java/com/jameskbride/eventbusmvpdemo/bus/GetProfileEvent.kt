@@ -1,3 +1,3 @@
 package com.jameskbride.eventbusmvpdemo.bus
 
-data class GetProfileEvent constructor(val id:String)
+class GetProfileEvent constructor(val id:String): NetworkRequestEvent()

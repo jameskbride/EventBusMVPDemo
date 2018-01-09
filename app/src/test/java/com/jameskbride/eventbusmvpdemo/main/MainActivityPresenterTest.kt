@@ -4,7 +4,7 @@ import com.jameskbride.eventbusmvpdemo.R
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileResponseEvent
-import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
+import com.jameskbride.eventbusmvpdemo.bus.NetworkErrorEvent
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import com.nhaarman.mockito_kotlin.verify
@@ -16,6 +16,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations.initMocks
+
 
 class MainActivityPresenterTest {
 
@@ -100,6 +101,14 @@ class MainActivityPresenterTest {
         subject.getProfile("1")
 
         assertEquals("1", getProfileEvent.id)
+    }
+
+    @Test
+    fun itDisplaysTheNetworkErrorViewWhenANetworkErrorEventIsReceived() {
+        val networkErrorEvent = NetworkErrorEvent(GetProfileEvent("1"))
+        subject.onNetworkErrorEvent(networkErrorEvent)
+
+        verify(view).displayNetworkError(networkErrorEvent)
     }
 
     @Subscribe

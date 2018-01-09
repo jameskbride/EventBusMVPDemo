@@ -7,15 +7,19 @@ import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import com.jameskbride.eventbusmvpdemo.R
+import com.jameskbride.eventbusmvpdemo.bus.NetworkErrorEvent
+import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFactory
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import com.jameskbride.eventbusmvpdemo.utils.ToasterWrapper
 import javax.inject.Inject
 
+
 class MainActivityImpl @Inject constructor(
         val presenter: MainActivityPresenter,
         val toasterWrapper: ToasterWrapper = ToasterWrapper(),
-        val ordersAdapterFactory:OrdersAdapterFactory = OrdersAdapterFactory()
+        val ordersAdapterFactory:OrdersAdapterFactory = OrdersAdapterFactory(),
+        val networkErrorViewFactory: NetworkErrorViewFactory = NetworkErrorViewFactory()
 ): MainActivityView {
     private lateinit var mainActivity: MainActivity
 
@@ -61,5 +65,10 @@ class MainActivityImpl @Inject constructor(
 
     fun onPause() {
         presenter.close()
+    }
+
+    override fun displayNetworkError(networkErrorEvent: NetworkErrorEvent) {
+        val networkErrorViewFragment = networkErrorViewFactory.make(networkErrorEvent.networkRequestEvent)
+        networkErrorViewFragment.show(mainActivity.supportFragmentManager, "networkError")
     }
 }

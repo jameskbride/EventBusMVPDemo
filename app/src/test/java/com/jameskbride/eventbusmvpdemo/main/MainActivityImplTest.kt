@@ -1,17 +1,25 @@
 package com.jameskbride.eventbusmvpdemo.main
 
+import android.support.v4.app.FragmentManager
 import android.view.View
 import android.widget.*
 import com.jameskbride.eventbusmvpdemo.R
+import com.jameskbride.eventbusmvpdemo.bus.NetworkErrorEvent
+import com.jameskbride.eventbusmvpdemo.bus.NetworkRequestEvent
+import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFactory
+import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFragment
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import com.jameskbride.eventbusmvpdemo.utils.ToasterWrapper
+import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations.initMocks
+
 
 class MainActivityImplTest {
 
@@ -29,6 +37,9 @@ class MainActivityImplTest {
     @Mock private lateinit var orders:ListView
     @Mock private lateinit var ordersAdapter:ArrayAdapter<String>
     @Mock private lateinit var ordersAdapterFactory:OrdersAdapterFactory
+    @Mock private lateinit var networkErrorViewFactory:NetworkErrorViewFactory
+    @Mock private lateinit var networkErrorViewFragment:NetworkErrorViewFragment
+    @Mock private lateinit var fragmentManager:FragmentManager
 
     private lateinit var subject:MainActivityImpl
 
@@ -36,7 +47,7 @@ class MainActivityImplTest {
     fun setUp() {
         initMocks(this)
 
-        subject = MainActivityImpl(presenter, toasterWrapper, ordersAdapterFactory)
+        subject = MainActivityImpl(presenter, toasterWrapper, ordersAdapterFactory, networkErrorViewFactory)
 
         whenever(mainActivity.findViewById<TextView>(R.id.customer_name)).thenReturn(customerName)
         whenever(mainActivity.findViewById<TextView>(R.id.address_line_1)).thenReturn(addressLine1)
@@ -47,6 +58,7 @@ class MainActivityImplTest {
         whenever(mainActivity.findViewById<LinearLayout>(R.id.no_orders_block)).thenReturn(noOrdersBlock)
         whenever(mainActivity.findViewById<LinearLayout>(R.id.found_orders_block)).thenReturn(foundOrdersBlock)
         whenever(mainActivity.findViewById<ListView>(R.id.order_list)).thenReturn(orders)
+        whenever(mainActivity.supportFragmentManager).thenReturn(fragmentManager)
 
         subject.onCreate(null, mainActivity)
     }
@@ -122,6 +134,16 @@ class MainActivityImplTest {
 
         verify(foundOrdersBlock).setVisibility(View.GONE)
         verify(noOrdersBlock).setVisibility(View.VISIBLE)
+    }
+
+    @Test
+    fun itCanDisplayTheNetworkErrorView() {
+        val networkRequestEvent = NetworkRequestEvent()
+        whenever(networkErrorViewFactory.make(networkRequestEvent)).thenReturn(networkErrorViewFragment)
+
+        subject.displayNetworkError(NetworkErrorEvent(networkRequestEvent))
+
+        verify(networkErrorViewFragment).show(eq(fragmentManager), eq("networkError"))
     }
 
     private fun buildProfileResponseWithoutOrders(): ProfileResponse {

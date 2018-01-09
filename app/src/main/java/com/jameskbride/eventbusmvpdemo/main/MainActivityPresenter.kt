@@ -11,6 +11,7 @@ import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import javax.inject.Inject
+import com.jameskbride.eventbusmvpdemo.bus.NetworkErrorEvent
 
 class MainActivityPresenter @Inject constructor(override val eventBus: EventBus) : BusAware {
     lateinit var view: MainActivityView
@@ -37,6 +38,11 @@ class MainActivityPresenter @Inject constructor(override val eventBus: EventBus)
             view.displayNoOrders()
         }
     }
+
+    @Subscribe
+    fun onNetworkErrorEvent(networkErrorEvent: NetworkErrorEvent) {
+        view.displayNetworkError(networkErrorEvent)
+    }
 }
 
 interface MainActivityView {
@@ -44,4 +50,5 @@ interface MainActivityView {
     fun displayProfileDetails(profileResponse: ProfileResponse)
     fun displayOrders(orderHistory: List<Order>)
     fun displayNoOrders()
+    fun displayNetworkError(networkErrorEvent: NetworkErrorEvent)
 }

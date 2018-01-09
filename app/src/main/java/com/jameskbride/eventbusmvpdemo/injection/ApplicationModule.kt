@@ -18,6 +18,13 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Named
 import javax.inject.Singleton
+import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFragmentImpl
+import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewPresenter
+import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFactory
+
+
+
+
 
 @Module
 class ApplicationModule {
@@ -88,5 +95,21 @@ class ApplicationModule {
     @Provides
     fun makeMainActivityPresenter(eventBus: EventBus): MainActivityPresenter {
         return MainActivityPresenter(eventBus)
+    }
+
+    @Provides
+    @Singleton
+    fun makeNetworkErrorViewFactory(): NetworkErrorViewFactory {
+        return NetworkErrorViewFactory()
+    }
+
+    @Provides
+    fun makeNetworkErrorViewPresenter(eventBus: EventBus): NetworkErrorViewPresenter {
+        return NetworkErrorViewPresenter(eventBus)
+    }
+
+    @Provides
+    fun makeNetworkErrorViewFragmentImpl(presenter: NetworkErrorViewPresenter): NetworkErrorViewFragmentImpl {
+        return NetworkErrorViewFragmentImpl(presenter)
     }
 }
