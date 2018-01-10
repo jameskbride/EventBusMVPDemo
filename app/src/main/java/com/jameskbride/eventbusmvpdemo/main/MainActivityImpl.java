@@ -3,6 +3,7 @@ package com.jameskbride.eventbusmvpdemo.main;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -38,15 +39,22 @@ public class MainActivityImpl implements MainActivityView {
         this.presenter = presenter;
     }
 
-    public void onCreate(Bundle savedInstanceState, MainActivity mainActivity) {
+    public void onCreate(Bundle savedInstanceState, final MainActivity mainActivity) {
         mainActivity.setContentView(R.layout.activity_main);
         this.mainActivity = mainActivity;
         presenter.setView(this);
+
+        mainActivity.findViewById(R.id.submit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EditText profileIdEdit = mainActivity.findViewById(R.id.profile_id_edit);
+                presenter.getProfile(profileIdEdit.getText().toString());
+            }
+        });
     }
 
     public void onResume(final MainActivity mainActivity) {
         presenter.open();
-        presenter.getProfile("1");
     }
 
     public void onPause(final MainActivity mainActivity) {

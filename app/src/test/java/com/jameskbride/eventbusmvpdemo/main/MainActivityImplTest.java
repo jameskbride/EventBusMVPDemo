@@ -1,8 +1,11 @@
 package com.jameskbride.eventbusmvpdemo.main;
 
 import android.support.v4.app.FragmentManager;
+import android.text.Editable;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -21,6 +24,7 @@ import com.jameskbride.eventbusmvpdemo.utils.ToasterWrapper;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 
 import java.util.ArrayList;
@@ -28,6 +32,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -37,6 +42,9 @@ public class MainActivityImplTest {
     @Mock private MainActivity mainActivity;
     @Mock private MainActivityPresenter presenter;
     @Mock private ToasterWrapper toasterWrapper;
+    @Mock private EditText profileIdEditText;
+    @Mock private Editable editable;
+    @Mock private Button submitButton;
     @Mock private TextView customerName;
     @Mock private TextView addressLine1;
     @Mock private TextView addressLine2;
@@ -68,6 +76,9 @@ public class MainActivityImplTest {
         subject.networkErrorViewFactory = networkErrorViewFactory;
         subject.securityErrorViewFactory = securityErrorViewFactory;
 
+        when(mainActivity.findViewById(R.id.profile_id_edit)).thenReturn(profileIdEditText);
+        when(profileIdEditText.getText()).thenReturn(editable);
+        when(mainActivity.findViewById(R.id.submit)).thenReturn(submitButton);
         when(mainActivity.findViewById(R.id.customer_name)).thenReturn(customerName);
         when(mainActivity.findViewById(R.id.address_line_1)).thenReturn(addressLine1);
         when(mainActivity.findViewById(R.id.address_line_2)).thenReturn(addressLine2);
@@ -89,6 +100,19 @@ public class MainActivityImplTest {
     }
 
     @Test
+    public void onCreateConfiguresTheSubmitButton() {
+        when(editable.toString()).thenReturn("2");
+        subject.onCreate(null, mainActivity);
+        ArgumentCaptor<View.OnClickListener> onClickCaptor = ArgumentCaptor.forClass(View.OnClickListener.class);
+
+        verify(submitButton, atLeastOnce()).setOnClickListener(onClickCaptor.capture());
+
+        onClickCaptor.getValue().onClick(null);
+
+        verify(presenter).getProfile("2");
+    }
+
+    @Test
     public void itCanDisplayAnErrorMessage() {
         when(toasterWrapper.makeText(mainActivity, R.string.oops, Toast.LENGTH_LONG)).thenReturn(toasterWrapper);
 
@@ -96,13 +120,6 @@ public class MainActivityImplTest {
 
         verify(toasterWrapper).makeText(mainActivity, R.string.oops, Toast.LENGTH_LONG);
         verify(toasterWrapper).show();
-    }
-
-    @Test
-    public void onResumeRequestsTheProfile() {
-        subject.onResume(mainActivity);
-
-        verify(presenter).getProfile("1");
     }
 
     @Test
