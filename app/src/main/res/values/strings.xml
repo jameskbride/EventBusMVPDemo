@@ -7,4 +7,7 @@
     <string name="orders">Orders</string>
     <string name="retry">Retry</string>
     <string name="network_error_message">Oops, something went wrong!</string>
+    <string name="dismiss">Ok</string>
+    <string name="security_error_message">Please log in</string>
+    <string name="submit">Submit</string>
 </resources>

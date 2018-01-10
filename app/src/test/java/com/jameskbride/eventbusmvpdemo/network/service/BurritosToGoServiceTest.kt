@@ -1,29 +1,27 @@
 package com.jameskbride.eventbusmvpdemo.network.service
 
-import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent
-import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent
-import com.jameskbride.eventbusmvpdemo.bus.GetProfileResponseEvent
-import com.jameskbride.eventbusmvpdemo.bus.NetworkErrorEvent
+import com.google.gson.Gson
+import com.jameskbride.eventbusmvpdemo.bus.*
 import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Observable
 import io.reactivex.schedulers.TestScheduler
+import okhttp3.MediaType
+import okhttp3.ResponseBody
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.junit.After
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations.initMocks
-import java.io.IOException
-import okhttp3.ResponseBody
-import com.google.gson.Gson
-import okhttp3.MediaType
-import org.junit.Assert.*
 import retrofit2.HttpException
 import retrofit2.Response
+import java.io.IOException
+
 
 class BurritosToGoServiceTest {
 
@@ -37,6 +35,7 @@ class BurritosToGoServiceTest {
     private var getProfileErrorEventFired: Boolean = false
     private lateinit var getProfileResponseEvent: GetProfileResponseEvent
     private var networkErrorEventfired: Boolean = false
+    private var securityErrorEventFired: Boolean = false
 
     @Before
     fun setUp() {
@@ -102,6 +101,17 @@ class BurritosToGoServiceTest {
         assertTrue(networkErrorEventfired)
     }
 
+    @Test
+    fun itPostsASecurityErrorWhenAnUnauthorizedResponseOccurs() {
+        val httpException = HttpException(Response.error<Any>(401, ResponseBody.create(MediaType.parse("application/json"), "")))
+        whenever(burritosToGoApi.getProfile("2")).thenReturn(Observable.error<ProfileResponse>(httpException))
+
+        eventBus.post(GetProfileEvent("2"))
+        testScheduler.triggerActions()
+
+        assertTrue(securityErrorEventFired)
+    }
+
     @Subscribe
     fun onGetProfileErrorEvent(getProfileErrorEvent: GetProfileErrorEvent){
         getProfileErrorEventFired = true
@@ -115,6 +125,11 @@ class BurritosToGoServiceTest {
     @Subscribe
     fun onNetworkErrorEvent(networkErrorEvent: NetworkErrorEvent) {
         networkErrorEventfired = true
+    }
+
+    @Subscribe
+    fun onSecurityErrorEvent(securityErrorEvent: SecurityErrorEvent) {
+        securityErrorEventFired = true
     }
 
     private fun buildProfileResponseWithoutOrders(): ProfileResponse {

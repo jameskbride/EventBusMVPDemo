@@ -7,6 +7,7 @@ import com.jameskbride.eventbusmvpdemo.bus.GetProfileResponseEvent
 import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
 import com.jameskbride.eventbusmvpdemo.network.NetworkApiWrapper
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
+import com.jameskbride.eventbusmvpdemo.network.SecurityApiWrapper
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.functions.Consumer
@@ -23,17 +24,17 @@ class BurritosToGoService @Inject constructor(
     @Subscribe
     fun onGetProfileEvent(getProfileEvent: GetProfileEvent) {
         val call: Observable<ProfileResponse> = burritosToGoApi.getProfile(getProfileEvent.id)
+        val getProfileConsumer = Consumer<ProfileResponse> { result -> eventBus.post(GetProfileResponseEvent(result)) }
+        val getProfileErrorConsumer = Consumer<Throwable>{ error: Throwable -> eventBus.post(GetProfileErrorEvent()) }
+        val securityApiWrapper = SecurityApiWrapper(eventBus, getProfileErrorConsumer)
+        val networkApiWrapper = NetworkApiWrapper(eventBus, securityApiWrapper, getProfileEvent)
 
         call
             .subscribeOn(processScheduler)
             .observeOn(androidScheduler)
             .subscribe (
-                    object: Consumer<ProfileResponse> {
-                        override fun accept(result: ProfileResponse) {
-                            eventBus.post(GetProfileResponseEvent(result))
-                        }
-                    },
-                    NetworkApiWrapper(eventBus, { error -> eventBus.post(GetProfileErrorEvent()) }, getProfileEvent)
+                    getProfileConsumer,
+                    networkApiWrapper
             )
     }
 }

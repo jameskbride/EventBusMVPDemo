@@ -21,6 +21,10 @@ import javax.inject.Singleton
 import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFragmentImpl
 import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewPresenter
 import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFactory
+import com.jameskbride.eventbusmvpdemo.security.SecurityErrorViewFragmentImpl
+import com.jameskbride.eventbusmvpdemo.security.SecurityErrorViewPresenter
+
+
 
 
 
@@ -111,5 +115,15 @@ class ApplicationModule {
     @Provides
     fun makeNetworkErrorViewFragmentImpl(presenter: NetworkErrorViewPresenter): NetworkErrorViewFragmentImpl {
         return NetworkErrorViewFragmentImpl(presenter)
+    }
+
+    @Provides
+    fun makeSecurityErrorViewPresenter(eventBus: EventBus): SecurityErrorViewPresenter {
+        return SecurityErrorViewPresenter(eventBus)
+    }
+
+    @Provides
+    fun makeSecurityErrorViewFragmentImpl(presenter: SecurityErrorViewPresenter): SecurityErrorViewFragmentImpl {
+        return SecurityErrorViewFragmentImpl(presenter)
     }
 }

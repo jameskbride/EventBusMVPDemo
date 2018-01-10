@@ -3,6 +3,7 @@ package com.jameskbride.eventbusmvpdemo.injection
 import com.jameskbride.eventbusmvpdemo.EventBusMVPDemoApplication
 import com.jameskbride.eventbusmvpdemo.main.MainActivity
 import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFragment
+import com.jameskbride.eventbusmvpdemo.security.SecurityErrorViewFragment
 import dagger.Component
 import javax.inject.Singleton
 
@@ -13,6 +14,7 @@ interface ApplicationComponent {
     fun inject(mainActivity: MainActivity)
     fun inject(application: EventBusMVPDemoApplication)
     fun inject(networkErrorViewFragment: NetworkErrorViewFragment)
+    fun inject(securityErrorViewFragment: SecurityErrorViewFragment)
 }
 
 class ApplicationComponentFactory {

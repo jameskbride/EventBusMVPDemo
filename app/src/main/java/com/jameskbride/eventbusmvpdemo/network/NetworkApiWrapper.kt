@@ -10,14 +10,14 @@ import java.io.IOException
 
 class NetworkApiWrapper<T : Throwable>(
         override val eventBus: EventBus,
-        val consumer: (t: T) -> Unit,
+        val consumer:Consumer<T>,
         val networkRequestEvent: NetworkRequestEvent) : Consumer<T>, BusAware {
 
     override fun accept(t: T) {
         if (t is IOException) {
             eventBus.post(NetworkErrorEvent(networkRequestEvent))
         } else {
-            consumer(t)
+            consumer.accept(t)
         }
     }
 }

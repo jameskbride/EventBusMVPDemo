@@ -3,6 +3,7 @@ package com.jameskbride.eventbusmvpdemo.network
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent
 import com.jameskbride.eventbusmvpdemo.bus.NetworkErrorEvent
 import com.jameskbride.eventbusmvpdemo.bus.NetworkRequestEvent
+import io.reactivex.functions.Consumer
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.junit.After
@@ -30,16 +31,16 @@ class NetworkApiWrapperTest {
         eventBus = EventBus.getDefault()
         networkRequestEvent = NetworkRequestEvent()
 
-        subject = NetworkApiWrapper(eventBus,
-                { error -> eventBus.post(GetProfileErrorEvent()) },
-                networkRequestEvent)
+        val errorConsumer = Consumer<Throwable> { error -> eventBus.post(GetProfileErrorEvent()) }
 
-        eventBus!!.register(this)
+        subject = NetworkApiWrapper(eventBus, errorConsumer, networkRequestEvent)
+
+        eventBus.register(this)
     }
 
     @After
     fun tearDown() {
-        eventBus!!.unregister(this)
+        eventBus.unregister(this)
     }
 
     @Test
