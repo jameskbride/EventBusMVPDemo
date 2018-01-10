@@ -15,6 +15,8 @@ import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFactory;
 import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFragment;
 import com.jameskbride.eventbusmvpdemo.network.Order;
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse;
+import com.jameskbride.eventbusmvpdemo.security.SecurityErrorViewFactory;
+import com.jameskbride.eventbusmvpdemo.security.SecurityErrorViewFragment;
 import com.jameskbride.eventbusmvpdemo.utils.ToasterWrapper;
 
 import org.junit.Before;
@@ -48,7 +50,10 @@ public class MainActivityImplTest {
     @Mock private OrdersAdapterFactory ordersAdapterFactory;
     @Mock private View view;
     @Mock private NetworkErrorViewFragment networkErrorViewFragment;
+    @Mock private SecurityErrorViewFragment securityErrorViewFragment;
     @Mock private NetworkErrorViewFactory networkErrorViewFactory;
+    @Mock private SecurityErrorViewFactory securityErrorViewFactory;
+
     @Mock private FragmentManager fragmentManager;
 
     private MainActivityImpl subject;
@@ -61,6 +66,7 @@ public class MainActivityImplTest {
         subject.toasterWrapper = toasterWrapper;
         subject.ordersAdapterFactory = ordersAdapterFactory;
         subject.networkErrorViewFactory = networkErrorViewFactory;
+        subject.securityErrorViewFactory = securityErrorViewFactory;
 
         when(mainActivity.findViewById(R.id.customer_name)).thenReturn(customerName);
         when(mainActivity.findViewById(R.id.address_line_1)).thenReturn(addressLine1);
@@ -160,7 +166,16 @@ public class MainActivityImplTest {
 
         subject.displayNetworkError(new NetworkErrorEvent(networkRequestEvent));
 
-        verify(networkErrorViewFragment).show(eq(fragmentManager), anyString());
+        verify(networkErrorViewFragment).show(eq(fragmentManager), eq("networkError"));
+    }
+
+    @Test
+    public void itCanDisplayTheSecurityErrorView() {
+        when(securityErrorViewFactory.make()).thenReturn(securityErrorViewFragment);
+
+        subject.displaySecurityError();
+
+        verify(securityErrorViewFragment).show(eq(fragmentManager), eq("securityError"));
     }
 
     private ProfileResponse buildProfileResponseWithoutOrders() {

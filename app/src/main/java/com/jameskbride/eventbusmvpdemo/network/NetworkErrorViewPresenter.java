@@ -7,7 +7,7 @@ import org.greenrobot.eventbus.EventBus;
 
 public class NetworkErrorViewPresenter extends BusAware {
 
-    NetworkErrorView view;
+    public NetworkErrorView view;
 
     public NetworkErrorViewPresenter(EventBus bus) {
         super(bus);

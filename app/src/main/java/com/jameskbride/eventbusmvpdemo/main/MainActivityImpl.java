@@ -14,6 +14,8 @@ import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFactory;
 import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFragment;
 import com.jameskbride.eventbusmvpdemo.network.Order;
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse;
+import com.jameskbride.eventbusmvpdemo.security.SecurityErrorViewFactory;
+import com.jameskbride.eventbusmvpdemo.security.SecurityErrorViewFragment;
 import com.jameskbride.eventbusmvpdemo.utils.ToasterWrapper;
 
 import java.util.ArrayList;
@@ -26,9 +28,9 @@ public class MainActivityImpl implements MainActivityView {
     ToasterWrapper toasterWrapper = new ToasterWrapper();
     OrdersAdapterFactory ordersAdapterFactory = new OrdersAdapterFactory();
     NetworkErrorViewFactory networkErrorViewFactory = new NetworkErrorViewFactory();
+    SecurityErrorViewFactory securityErrorViewFactory = new SecurityErrorViewFactory();
 
     private MainActivityPresenter presenter;
-
     private MainActivity mainActivity;
 
     @Inject
@@ -113,6 +115,8 @@ public class MainActivityImpl implements MainActivityView {
 
     @Override
     public void displaySecurityError() {
-
+        SecurityErrorViewFragment securityErrorViewFragment =
+                securityErrorViewFactory.make();
+        securityErrorViewFragment.show(mainActivity.getSupportFragmentManager(), "securityError");
     }
 }
