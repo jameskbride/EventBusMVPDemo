@@ -5,6 +5,7 @@ import com.jameskbride.eventbusmvpdemo.GetProfileResponseEvent;
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent;
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent;
 import com.jameskbride.eventbusmvpdemo.bus.NetworkErrorEvent;
+import com.jameskbride.eventbusmvpdemo.bus.SecurityErrorEvent;
 import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi;
 import com.jameskbride.eventbusmvpdemo.network.Order;
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse;
@@ -24,10 +25,8 @@ import io.reactivex.Observable;
 import io.reactivex.schedulers.TestScheduler;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.HttpException;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -47,6 +46,7 @@ public class BurritosToGoServiceTest {
     private boolean getProfileErrorEventFired;
     private GetProfileResponseEvent getProfileResponseEvent;
     private boolean networkErrorEventfired;
+    private boolean securityErrorEventFired;
 
     @Before
     public void setUp() {
@@ -89,6 +89,17 @@ public class BurritosToGoServiceTest {
     }
 
     @Test
+    public void itPostsASecurityErrorWhenAnUnauthorizedResponseOccurs() {
+        HttpException httpException = new HttpException(Response.error(401, ResponseBody.create(MediaType.parse("application/json"), "")));
+        when(burritosToGoApi.getProfile("2")).thenReturn(Observable.<ProfileResponse>error(httpException));
+
+        eventBus.post(new GetProfileEvent("2"));
+        testScheduler.triggerActions();
+
+        assertTrue(securityErrorEventFired);
+    }
+
+    @Test
     public void onGetProfileEventEmitsGetProfileErrorWhenAFailureOccurs() {
         Gson gson = new Gson();
         gson.toJson(new CustomError());
@@ -127,6 +138,11 @@ public class BurritosToGoServiceTest {
     @Subscribe
     public void onNetworkErrorEvent(NetworkErrorEvent networkErrorEvent) {
         networkErrorEventfired = true;
+    }
+
+    @Subscribe
+    public void onSecurityErrorEvent(SecurityErrorEvent securityErrorEvent) {
+        securityErrorEventFired = true;
     }
 
     private ProfileResponse buildProfileResponseWithOrders() {

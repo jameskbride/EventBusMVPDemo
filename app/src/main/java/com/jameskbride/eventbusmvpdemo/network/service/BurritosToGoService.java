@@ -7,6 +7,7 @@ import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent;
 import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi;
 import com.jameskbride.eventbusmvpdemo.network.NetworkApiWrapper;
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse;
+import com.jameskbride.eventbusmvpdemo.network.SecurityApiWrapper;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -33,22 +34,29 @@ public class BurritosToGoService extends BusAware {
     @Subscribe
     public void onGetProfileEvent(GetProfileEvent getProfileEvent) {
         Observable<ProfileResponse> call = burritosToGoApi.getProfile(getProfileEvent.getId());
-        call
-            .subscribeOn(processScheduler)
+
+        Consumer<ProfileResponse> getProfileConsumer = new GetProfileConsumer();
+
+        Consumer<Throwable> getProfileErrorConsumer = new GetProfileErrorConsumer();
+        SecurityApiWrapper securityApiWrapper = new SecurityApiWrapper(bus, getProfileErrorConsumer);
+        NetworkApiWrapper networkApiWrapper = new NetworkApiWrapper(bus, securityApiWrapper, getProfileEvent);
+
+        call.subscribeOn(processScheduler)
             .observeOn(androidScheduler)
-            .subscribe(
-                    new Consumer<ProfileResponse>() {
-                           @Override
-                           public void accept(ProfileResponse response) throws Exception {
-                               bus.post(new GetProfileResponseEvent(response));
-                           }
-                       },
-                    new NetworkApiWrapper(bus, new Consumer<Throwable>() {
-                        @Override
-                        public void accept(Throwable throwable) throws Exception {
-                            bus.post(new GetProfileErrorEvent());
-                        }
-                    }, getProfileEvent)
-            );
+            .subscribe(getProfileConsumer, networkApiWrapper);
+    }
+
+    private class GetProfileErrorConsumer implements Consumer<Throwable> {
+        @Override
+        public void accept(Throwable throwable) throws Exception {
+            bus.post(new GetProfileErrorEvent());
+        }
+    }
+
+    private class GetProfileConsumer implements Consumer<ProfileResponse> {
+        @Override
+        public void accept(ProfileResponse response) throws Exception {
+            bus.post(new GetProfileResponseEvent(response));
+        }
     }
 }
