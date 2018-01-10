@@ -110,4 +110,9 @@ public class MainActivityImpl implements MainActivityView {
                 networkErrorViewFactory.make(networkErrorEvent.getNetworkRequestEvent());
         networkErrorViewFragment.show(mainActivity.getSupportFragmentManager(), "networkError");
     }
+
+    @Override
+    public void displaySecurityError() {
+
+    }
 }

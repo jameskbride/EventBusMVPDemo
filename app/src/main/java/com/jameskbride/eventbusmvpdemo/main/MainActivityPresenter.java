@@ -8,6 +8,7 @@ import com.jameskbride.eventbusmvpdemo.bus.BusAware;
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent;
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent;
 import com.jameskbride.eventbusmvpdemo.bus.NetworkErrorEvent;
+import com.jameskbride.eventbusmvpdemo.bus.SecurityErrorEvent;
 import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi;
 import com.jameskbride.eventbusmvpdemo.network.Order;
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse;
@@ -49,6 +50,11 @@ public class MainActivityPresenter extends BusAware {
         view.displayError(R.string.oops);
     }
 
+    @Subscribe
+    public void onSecurityErrorEvent(SecurityErrorEvent securityErrorEvent) {
+        view.displaySecurityError();
+    }
+
     private void displayOrders(List<Order> orderHistory) {
         if (!orderHistory.isEmpty()) {
             view.displayOrders(orderHistory);
@@ -73,4 +79,5 @@ interface MainActivityView {
     void displayOrders(List<Order> orderHistory);
     void displayNoOrders();
     void displayNetworkError(NetworkErrorEvent networkErrorEvent);
+    void displaySecurityError();
 }
