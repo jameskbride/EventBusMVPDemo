@@ -10,19 +10,19 @@ import com.jameskbride.eventbusmvpdemo.security.SecurityErrorViewPresenter.Secur
 import javax.inject.Inject
 
 class SecurityErrorViewFragmentImpl @Inject
-constructor(private val presenter: SecurityErrorViewPresenter) : SecurityErrorView {
+constructor(val presenter: SecurityErrorViewPresenter) : SecurityErrorView {
     private var networkErrorViewFragment: SecurityErrorViewFragment? = null
 
-    fun onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle, securityErrorViewFragment: SecurityErrorViewFragment): View {
+    fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?, securityErrorViewFragment: SecurityErrorViewFragment): View {
         this.networkErrorViewFragment = securityErrorViewFragment
-        val view = inflater.inflate(R.layout.security_error, container)
+        val view = inflater?.inflate(R.layout.security_error, container)
         presenter.view = this
 
-        view.findViewById<Button>(R.id.ok_button).setOnClickListener {view: View? ->
+        view?.findViewById<Button>(R.id.ok_button)?.setOnClickListener {view: View? ->
             presenter.dismiss()
         }
 
-        return view
+        return view!!
     }
 
     fun onResume(securityErrorViewFragment: SecurityErrorViewFragment) {}

@@ -17,7 +17,7 @@ class SecurityErrorViewFragment : DialogFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         EventBusMVPDemoApplication.applicationComponent.inject(this)
 
-        return impl.onCreateView(inflater, container!!, savedInstanceState!!, this)
+        return impl.onCreateView(inflater, container, savedInstanceState, this)
     }
 
     override fun onResume() {

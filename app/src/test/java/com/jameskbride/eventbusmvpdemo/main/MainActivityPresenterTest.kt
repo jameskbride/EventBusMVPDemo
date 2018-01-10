@@ -1,10 +1,7 @@
 package com.jameskbride.eventbusmvpdemo.main
 
 import com.jameskbride.eventbusmvpdemo.R
-import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent
-import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent
-import com.jameskbride.eventbusmvpdemo.bus.GetProfileResponseEvent
-import com.jameskbride.eventbusmvpdemo.bus.NetworkErrorEvent
+import com.jameskbride.eventbusmvpdemo.bus.*
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import com.nhaarman.mockito_kotlin.verify
@@ -109,6 +106,15 @@ class MainActivityPresenterTest {
         subject.onNetworkErrorEvent(networkErrorEvent)
 
         verify(view).displayNetworkError(networkErrorEvent)
+    }
+
+    @Test
+    fun itDisplaysTheSecurityErrorViewWhenASecurityErrorEventIsReceived() {
+        val securityErrorEvent = SecurityErrorEvent()
+
+        subject.onSecurityErrorEvent(securityErrorEvent)
+
+        verify(view).displaySecurityError()
     }
 
     @Subscribe

@@ -2,15 +2,13 @@ package com.jameskbride.eventbusmvpdemo.main
 
 import android.os.Bundle
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.ListView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.jameskbride.eventbusmvpdemo.R
 import com.jameskbride.eventbusmvpdemo.bus.NetworkErrorEvent
 import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFactory
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
+import com.jameskbride.eventbusmvpdemo.security.SecurityErrorViewFactory
 import com.jameskbride.eventbusmvpdemo.utils.ToasterWrapper
 import javax.inject.Inject
 
@@ -19,7 +17,8 @@ class MainActivityImpl @Inject constructor(
         val presenter: MainActivityPresenter,
         val toasterWrapper: ToasterWrapper = ToasterWrapper(),
         val ordersAdapterFactory:OrdersAdapterFactory = OrdersAdapterFactory(),
-        val networkErrorViewFactory: NetworkErrorViewFactory = NetworkErrorViewFactory()
+        val networkErrorViewFactory: NetworkErrorViewFactory = NetworkErrorViewFactory(),
+        val securityErrorViewFactory: SecurityErrorViewFactory = SecurityErrorViewFactory()
 ): MainActivityView {
     private lateinit var mainActivity: MainActivity
 
@@ -27,6 +26,11 @@ class MainActivityImpl @Inject constructor(
         this.mainActivity = mainActivity
         mainActivity.setContentView(R.layout.activity_main)
         presenter.view = this
+
+        mainActivity.findViewById<Button>(R.id.submit).setOnClickListener {view: View? ->
+            val profileIdEdit = mainActivity.findViewById<EditText>(R.id.profile_id_edit)
+            presenter.getProfile(profileIdEdit.text.toString())
+        }
     }
 
     fun onResume() {
@@ -70,5 +74,10 @@ class MainActivityImpl @Inject constructor(
     override fun displayNetworkError(networkErrorEvent: NetworkErrorEvent) {
         val networkErrorViewFragment = networkErrorViewFactory.make(networkErrorEvent.networkRequestEvent)
         networkErrorViewFragment.show(mainActivity.supportFragmentManager, "networkError")
+    }
+
+    override fun displaySecurityError() {
+        val securityErrorViewFragment = securityErrorViewFactory.make()
+        securityErrorViewFragment.show(mainActivity.supportFragmentManager, "securityError")
     }
 }

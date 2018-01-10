@@ -10,20 +10,31 @@ import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFactory
 import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFragment
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
+import com.jameskbride.eventbusmvpdemo.security.SecurityErrorViewFactory
+import com.jameskbride.eventbusmvpdemo.security.SecurityErrorViewFragment
 import com.jameskbride.eventbusmvpdemo.utils.ToasterWrapper
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations.initMocks
+import android.R.attr.editable
+import android.text.Editable
+import android.widget.EditText
+import android.R.attr.onClick
+import org.mockito.ArgumentCaptor
+import android.R.attr.editable
+import com.nhaarman.mockito_kotlin.atLeastOnce
 
 
 class MainActivityImplTest {
 
     @Mock private lateinit var mainActivity:MainActivity
+    @Mock private lateinit var profileIdEditText: EditText
+    @Mock private lateinit var editable: Editable
+    @Mock private lateinit var submitButton: Button
     @Mock private lateinit var presenter:MainActivityPresenter
     @Mock private lateinit var toasterWrapper:ToasterWrapper
     @Mock private lateinit var customerName:TextView
@@ -38,7 +49,9 @@ class MainActivityImplTest {
     @Mock private lateinit var ordersAdapter:ArrayAdapter<String>
     @Mock private lateinit var ordersAdapterFactory:OrdersAdapterFactory
     @Mock private lateinit var networkErrorViewFactory:NetworkErrorViewFactory
+    @Mock private lateinit var securityErrorViewFactory:SecurityErrorViewFactory
     @Mock private lateinit var networkErrorViewFragment:NetworkErrorViewFragment
+    @Mock private lateinit var securityErrorViewFragment:SecurityErrorViewFragment
     @Mock private lateinit var fragmentManager:FragmentManager
 
     private lateinit var subject:MainActivityImpl
@@ -47,8 +60,11 @@ class MainActivityImplTest {
     fun setUp() {
         initMocks(this)
 
-        subject = MainActivityImpl(presenter, toasterWrapper, ordersAdapterFactory, networkErrorViewFactory)
+        subject = MainActivityImpl(presenter, toasterWrapper, ordersAdapterFactory, networkErrorViewFactory, securityErrorViewFactory)
 
+        whenever(mainActivity.findViewById<EditText>(R.id.profile_id_edit)).thenReturn(profileIdEditText)
+        whenever(profileIdEditText.getText()).thenReturn(editable)
+        whenever(mainActivity.findViewById<Button>(R.id.submit)).thenReturn(submitButton)
         whenever(mainActivity.findViewById<TextView>(R.id.customer_name)).thenReturn(customerName)
         whenever(mainActivity.findViewById<TextView>(R.id.address_line_1)).thenReturn(addressLine1)
         whenever(mainActivity.findViewById<TextView>(R.id.address_line_2)).thenReturn(addressLine2)
@@ -66,6 +82,19 @@ class MainActivityImplTest {
     @Test
     fun onCreateSetsTheContentView() {
         verify(mainActivity).setContentView(R.layout.activity_main)
+    }
+
+    @Test
+    fun onCreateConfiguresTheSubmitButton() {
+        whenever(editable.toString()).thenReturn("2")
+        subject.onCreate(null, mainActivity)
+        val onClickCaptor = ArgumentCaptor.forClass(View.OnClickListener::class.java)
+
+        verify(submitButton, atLeastOnce()).setOnClickListener(onClickCaptor.capture())
+
+        onClickCaptor.value.onClick(null)
+
+        verify(presenter).getProfile("2")
     }
 
     @Test
@@ -144,6 +173,15 @@ class MainActivityImplTest {
         subject.displayNetworkError(NetworkErrorEvent(networkRequestEvent))
 
         verify(networkErrorViewFragment).show(eq(fragmentManager), eq("networkError"))
+    }
+
+    @Test
+    fun itCanDisplayTheSecurityErrorView() {
+        whenever(securityErrorViewFactory.make()).thenReturn(securityErrorViewFragment)
+
+        subject.displaySecurityError()
+
+        verify(securityErrorViewFragment).show(eq(fragmentManager), eq("securityError"))
     }
 
     private fun buildProfileResponseWithoutOrders(): ProfileResponse {
