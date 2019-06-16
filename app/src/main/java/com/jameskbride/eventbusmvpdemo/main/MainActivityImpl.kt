@@ -27,7 +27,7 @@ class MainActivityImpl @Inject constructor(
         mainActivity.setContentView(R.layout.activity_main)
         presenter.view = this
 
-        mainActivity.findViewById<Button>(R.id.submit).setOnClickListener {view: View? ->
+        mainActivity.findViewById<View>(R.id.submit).setOnClickListener {view: View? ->
             val profileIdEdit = mainActivity.findViewById<EditText>(R.id.profile_id_edit)
             presenter.getProfile(profileIdEdit.text.toString())
         }

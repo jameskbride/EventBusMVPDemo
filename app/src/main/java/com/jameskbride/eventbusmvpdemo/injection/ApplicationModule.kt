@@ -24,12 +24,6 @@ import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFactory
 import com.jameskbride.eventbusmvpdemo.security.SecurityErrorViewFragmentImpl
 import com.jameskbride.eventbusmvpdemo.security.SecurityErrorViewPresenter
 
-
-
-
-
-
-
 @Module
 class ApplicationModule {
 
