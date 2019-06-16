@@ -31,17 +31,10 @@
             android:layout_height="wrap_content"
             android:text="@string/name_label" />
 
-        <android.support.v4.widget.Space
-            android:id="@+id/spacer"
-            android:layout_width="5dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintRight_toRightOf="@id/first_name_label" />
-
         <TextView
             android:id="@+id/customer_name"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintRight_toRightOf="@id/spacer" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <TextView
