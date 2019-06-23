@@ -5,4 +5,5 @@
     <string name="name_label">Name:</string>
     <string name="address_label">Address</string>
     <string name="orders">Orders</string>
+    <string name="submit">Submit</string>
 </resources>

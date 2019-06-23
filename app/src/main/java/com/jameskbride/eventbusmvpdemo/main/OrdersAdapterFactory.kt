@@ -1,8 +1,8 @@
 package com.jameskbride.eventbusmvpdemo.main
 
 import android.content.Context
-import android.support.annotation.LayoutRes
 import android.widget.ArrayAdapter
+import androidx.annotation.LayoutRes
 
 class OrdersAdapterFactory {
 

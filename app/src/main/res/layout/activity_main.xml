@@ -1,9 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <EditText
+            android:id="@+id/profile_id_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/submit"/>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/name_block"
@@ -18,17 +31,10 @@
             android:layout_height="wrap_content"
             android:text="@string/name_label" />
 
-        <android.support.v4.widget.Space
-            android:id="@+id/spacer"
-            android:layout_width="5dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintRight_toRightOf="@id/first_name_label" />
-
         <TextView
             android:id="@+id/customer_name"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintRight_toRightOf="@id/spacer" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <TextView

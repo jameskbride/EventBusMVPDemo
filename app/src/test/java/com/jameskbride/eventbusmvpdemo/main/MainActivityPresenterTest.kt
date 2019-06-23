@@ -3,7 +3,7 @@ package com.jameskbride.eventbusmvpdemo.main
 import com.jameskbride.eventbusmvpdemo.FailureCallFake
 import com.jameskbride.eventbusmvpdemo.R
 import com.jameskbride.eventbusmvpdemo.SuccessCallFake
-import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
+import com.jameskbride.eventbusmvpdemo.network.ProfileApi
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import com.nhaarman.mockito_kotlin.verify
@@ -17,7 +17,7 @@ import java.io.IOException
 
 class MainActivityPresenterTest {
 
-    @Mock private lateinit var burritosToGoApi:BurritosToGoApi
+    @Mock private lateinit var burritosToGoApi:ProfileApi
     @Mock private lateinit var view:MainActivityView
 
     private lateinit var subject:MainActivityPresenter
