@@ -17,7 +17,7 @@ import java.io.IOException
 
 class MainActivityPresenterTest {
 
-    @Mock private lateinit var burritosToGoApi:ProfileApi
+    @Mock private lateinit var profileApi:ProfileApi
     @Mock private lateinit var view:MainActivityView
 
     private lateinit var subject:MainActivityPresenter
@@ -25,14 +25,14 @@ class MainActivityPresenterTest {
     @Before
     fun setUp() {
         initMocks(this)
-        subject = MainActivityPresenter(burritosToGoApi)
+        subject = MainActivityPresenter(profileApi)
         subject.view = view
     }
 
     @Test
     fun itDisplaysAnErrorViewOnFailureOfGetProfile() {
         val profileResponseCall = FailureCallFake<ProfileResponse>(IOException("parse exception"))
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall)
+        whenever(profileApi.getProfile("1")).thenReturn(profileResponseCall)
 
         subject.getProfile("1")
 
@@ -43,7 +43,7 @@ class MainActivityPresenterTest {
     fun itDisplaysProfileDetailsOnResponseOfGetProfile() {
         val profileResponse = buildProfileResponseWithOrders()
         val profileResponseCall = SuccessCallFake<ProfileResponse>(Response.success(profileResponse))
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall)
+        whenever(profileApi.getProfile("1")).thenReturn(profileResponseCall)
 
         subject.getProfile("1")
 
@@ -54,7 +54,7 @@ class MainActivityPresenterTest {
     fun itDisplaysTheOrdersViewOnResponseOfGetProfileWithOrders() {
         val profileResponse = buildProfileResponseWithOrders()
         val profileResponseCall = SuccessCallFake<ProfileResponse>(Response.success(profileResponse))
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall)
+        whenever(profileApi.getProfile("1")).thenReturn(profileResponseCall)
 
         subject.getProfile("1")
 
@@ -65,7 +65,7 @@ class MainActivityPresenterTest {
     fun itDisplaysTheNoOrdersFoundViewOnResponseOfGetProfileWithoutOrders() {
         val profileResponse = buildProfileResponseWithoutOrders()
         val profileResponseCall = SuccessCallFake<ProfileResponse>(Response.success(profileResponse))
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall)
+        whenever(profileApi.getProfile("1")).thenReturn(profileResponseCall)
 
         subject.getProfile("1")
 
