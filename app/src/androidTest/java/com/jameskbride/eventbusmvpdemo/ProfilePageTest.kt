@@ -1,20 +1,17 @@
 package com.jameskbride.eventbusmvpdemo
 
-import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import clickOn
 import com.jameskbride.eventbusmvpdemo.main.MainActivity
-import org.hamcrest.core.AllOf.allOf
+import com.jameskbride.eventbusmvpdemo.pages.NetworkErrorPage
+import com.jameskbride.eventbusmvpdemo.pages.ProfilePage
+import com.jameskbride.eventbusmvpdemo.pages.SecurityErrorPage
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import shouldDisplay
-import shouldDisplayText
-import shouldScrollToAndDisplay
-import typeInto
+import shouldDisplayTextFor
 import waitOn
 
 @RunWith(AndroidJUnit4::class)
@@ -23,56 +20,68 @@ class ProfilePageTest {
     @get:Rule
     val activityRule = ActivityTestRule(MainActivity::class.java,true, true)
 
+    private lateinit var profilePage: ProfilePage
+    private lateinit var networkErrorPage: NetworkErrorPage
+    private lateinit var securityErrorPage: SecurityErrorPage
+
+    @Before
+    fun setUp() {
+        this.profilePage = ProfilePage()
+        this.networkErrorPage = NetworkErrorPage()
+        this.securityErrorPage = SecurityErrorPage()
+    }
+
     @Test
     fun whenTheViewLoadsItDisplaysTheSearchView() {
-        shouldDisplay(R.id.profile_id_edit)
+        shouldDisplay(profilePage.profileEditButton())
     }
 
     @Test
     fun givenAGoodProfileIdItDisplaysTheProfile() {
-        typeInto(R.id.profile_id_edit, "1")
+        val profileId = "1"
+        profilePage.enterProfileId(profileId)
 
-        clickOn(R.id.submit)
+        profilePage.submitProfileId()
 
-        shouldDisplayText("Walter White")
-        shouldDisplayText("123 Street Ln")
-        shouldDisplayText("Albuquerque")
-        shouldDisplayText("NM")
-        shouldDisplayText("87101")
+        shouldDisplayTextFor(profilePage.customerName(), "Walter White")
+        shouldDisplayTextFor(profilePage.addressLine1(),"123 Street Ln")
+        shouldDisplayTextFor(profilePage.city(),"Albuquerque")
+        shouldDisplayTextFor(profilePage.state(),"NM")
+        shouldDisplayTextFor(profilePage.zip(),"87101")
     }
 
     @Test
     fun givenAGoodProfileIdItDisplaysTheOrders() {
-        typeInto(R.id.profile_id_edit, "1")
+        profilePage.enterProfileId("1")
 
-        clickOn(R.id.submit)
+        profilePage.submitProfileId()
 
-        shouldScrollToAndDisplay("Large Pizza")
-        shouldScrollToAndDisplay("Industrial size beaker")
-        shouldScrollToAndDisplay("Barrel of Methylamine")
+        profilePage.displaysOrderText("Large Pizza")
+        profilePage.displaysOrderText("Industrial size beaker")
+        profilePage.displaysOrderText("Barrel of Methylamine")
     }
 
     @Test
     fun givenAnInvalidProfileIdItDisplaysTheNetworkErrorView() {
-        typeInto(R.id.profile_id_edit, "-1")
+        profilePage.enterProfileId("-1")
 
-        clickOn(R.id.submit)
+        profilePage.submitProfileId()
 
         waitOn {
-            shouldDisplayText("Oops, something went wrong!")
-            shouldDisplay(R.id.retry_button)
+            networkErrorPage.displaysErrorMessage("Oops, something went wrong!")
+            shouldDisplay(networkErrorPage.retryButton())
         }
     }
 
     @Test
     fun givenTheSecurityCheckFailedItDisplaysTheSecurityErrorView() {
-        typeInto(R.id.profile_id_edit, "2")
+        profilePage.enterProfileId("2")
 
-        clickOn(R.id.submit)
+        profilePage.submitProfileId()
 
         waitOn {
-            onView(allOf(withId(R.id.security_error_message), withText("Please log in"))).check(matches(isDisplayed()))
-            shouldDisplay(R.id.ok_button)
+            securityErrorPage.displaysSecurityMessage("Please log in")
+            shouldDisplay(securityErrorPage.okButton())
         }
     }
 }

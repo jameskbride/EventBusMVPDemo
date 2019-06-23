@@ -4,6 +4,7 @@ import android.support.test.espresso.action.ViewActions.*
 import android.support.test.espresso.assertion.ViewAssertions
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.util.Log
+import org.hamcrest.core.AllOf
 
 fun waitOn(millis: Long = 10000, action: () -> Unit) {
     var millisLeft = millis
@@ -29,6 +30,10 @@ fun shouldScrollToAndDisplay(text: String) {
 
 fun shouldDisplayText(text: String) {
     onView(withText(text)).check(ViewAssertions.matches(isDisplayed()))
+}
+
+fun shouldDisplayTextFor(securityErrorId: Int, securityErrorMessage: String) {
+    Espresso.onView(AllOf.allOf(withId(securityErrorId), withText(securityErrorMessage))).check(ViewAssertions.matches(isDisplayed()))
 }
 
 fun shouldDisplay(retryButton: Int) {
