@@ -111,13 +111,6 @@ class MainActivityImplTest {
     }
 
     @Test
-    fun onResumeRequestsTheProfile() {
-        subject.onResume()
-
-        verify(presenter).getProfile("1")
-    }
-
-    @Test
     fun onPauseClosesThePresenter() {
         subject.onPause()
 

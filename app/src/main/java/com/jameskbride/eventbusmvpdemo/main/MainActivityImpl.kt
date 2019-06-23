@@ -35,7 +35,6 @@ class MainActivityImpl @Inject constructor(
 
     fun onResume() {
         presenter.open()
-        presenter.getProfile("1")
     }
 
     override fun displayError(message: Int) {
