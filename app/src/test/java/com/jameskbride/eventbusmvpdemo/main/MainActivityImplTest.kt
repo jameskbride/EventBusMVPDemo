@@ -1,18 +1,21 @@
 package com.jameskbride.eventbusmvpdemo.main
 
+import android.text.Editable
 import android.view.View
 import android.widget.*
 import com.jameskbride.eventbusmvpdemo.FailureCallFake
 import com.jameskbride.eventbusmvpdemo.R
 import com.jameskbride.eventbusmvpdemo.SuccessCallFake
-import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
+import com.jameskbride.eventbusmvpdemo.network.ProfileApi
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import com.jameskbride.eventbusmvpdemo.utils.ToasterWrapper
+import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations.initMocks
@@ -22,8 +25,11 @@ import java.io.IOException
 class MainActivityImplTest {
 
     @Mock private lateinit var mainActivity:MainActivity
-    @Mock private lateinit var burritosToGoApi:BurritosToGoApi
+    @Mock private lateinit var profileApi:ProfileApi
     @Mock private lateinit var toasterWrapper:ToasterWrapper
+    @Mock private lateinit var profileTextEdit:EditText
+    @Mock private lateinit var editable:Editable
+    @Mock private lateinit var submitButton:Button
     @Mock private lateinit var customerName:TextView
     @Mock private lateinit var addressLine1:TextView
     @Mock private lateinit var addressLine2:TextView
@@ -42,8 +48,11 @@ class MainActivityImplTest {
     fun setUp() {
         initMocks(this)
 
-        subject = MainActivityImpl(burritosToGoApi, toasterWrapper, ordersAdapterFactory)
+        subject = MainActivityImpl(profileApi, toasterWrapper, ordersAdapterFactory)
 
+        whenever(mainActivity.findViewById<TextView>(R.id.profile_id_edit)).thenReturn(profileTextEdit)
+        whenever(profileTextEdit.getText()).thenReturn(editable)
+        whenever(mainActivity.findViewById<TextView>(R.id.submit)).thenReturn(submitButton)
         whenever(mainActivity.findViewById<TextView>(R.id.customer_name)).thenReturn(customerName)
         whenever(mainActivity.findViewById<TextView>(R.id.address_line_1)).thenReturn(addressLine1)
         whenever(mainActivity.findViewById<TextView>(R.id.address_line_2)).thenReturn(addressLine2)
@@ -63,26 +72,60 @@ class MainActivityImplTest {
     }
 
     @Test
-    fun onResumeDisplaysAnErrorMessageOnGetProfileFailure() {
+    fun onCreateConfiguresTheSubmitButton() {
+        whenever(editable.toString()).thenReturn("2")
+        subject.onCreate(null, mainActivity)
+        val onClickCaptor = ArgumentCaptor.forClass(View.OnClickListener::class.java)
+
+        verify(submitButton, atLeastOnce()).setOnClickListener(onClickCaptor.capture())
+        val profileResponse = buildProfileResponseWithOrders()
+        val profileResponseCall = SuccessCallFake<ProfileResponse>(Response.success(profileResponse))
+
+        whenever(profileApi.getProfile(anyString())).thenReturn(profileResponseCall)
+        whenever(ordersAdapterFactory.make(
+                mainActivity, android.R.layout.simple_list_item_1,
+                listOf(profileResponse.orderHistory[0].description))).thenReturn(ordersAdapter)
+
+        onClickCaptor.value.onClick(null)
+
+        verify(foundOrdersBlock).setVisibility(View.VISIBLE)
+        verify(noOrdersBlock).setVisibility(View.GONE)
+
+        verify(orders).setAdapter(ordersAdapter)
+    }
+
+    @Test
+    fun onCreateConfiguresTheSubmitButtonToDisplayAnErrorMessageOnFailure() {
+        whenever(editable.toString()).thenReturn("2")
+        subject.onCreate(null, mainActivity)
+        val onClickCaptor = ArgumentCaptor.forClass(View.OnClickListener::class.java)
+
+        verify(submitButton, atLeastOnce()).setOnClickListener(onClickCaptor.capture())
         val profileResponseCall = FailureCallFake<ProfileResponse>(IOException("parse exception"))
 
-        whenever(burritosToGoApi.getProfile(anyString())).thenReturn(profileResponseCall)
+        whenever(profileApi.getProfile(anyString())).thenReturn(profileResponseCall)
         whenever(toasterWrapper.makeText(mainActivity, R.string.oops, Toast.LENGTH_LONG)).thenReturn(toasterWrapper)
 
-        subject.onResume(mainActivity)
+        onClickCaptor.value.onClick(null)
 
         verify(toasterWrapper).makeText(mainActivity, R.string.oops, Toast.LENGTH_LONG)
         verify(toasterWrapper).show()
     }
 
     @Test
-    fun onResumeDisplaysTheProfileDetailsOnGetProfileResponse() {
+    fun onCreateConfiguresTheSubmitButtonToDisplayTheProfileDetailsOnGetProfileResponse() {
+        whenever(editable.toString()).thenReturn("2")
+        subject.onCreate(null, mainActivity)
+        val onClickCaptor = ArgumentCaptor.forClass(View.OnClickListener::class.java)
+
+        verify(submitButton, atLeastOnce()).setOnClickListener(onClickCaptor.capture())
         val profileResponse = buildProfileResponseWithoutOrders()
         val profileResponseCall = SuccessCallFake<ProfileResponse>(Response.success(profileResponse))
 
-        whenever(burritosToGoApi.getProfile(anyString())).thenReturn(profileResponseCall)
+        whenever(profileApi.getProfile(anyString())).thenReturn(profileResponseCall)
+        whenever(toasterWrapper.makeText(mainActivity, R.string.oops, Toast.LENGTH_LONG)).thenReturn(toasterWrapper)
 
-        subject.onResume(mainActivity)
+        onClickCaptor.value.onClick(null)
 
         verify(customerName).setText("${profileResponse.firstName} ${profileResponse.lastName}")
         verify(addressLine1).setText(profileResponse.addressLine1)
@@ -93,16 +136,21 @@ class MainActivityImplTest {
     }
 
     @Test
-    fun onResumeItDisplaysOrdersWhenTheyAreAvailable() {
+    fun onCreateConfiguresTheSubmitButtonToDisplayOrdersWhenTheyAreAvailable() {
+        whenever(editable.toString()).thenReturn("2")
+        subject.onCreate(null, mainActivity)
+        val onClickCaptor = ArgumentCaptor.forClass(View.OnClickListener::class.java)
+        verify(submitButton, atLeastOnce()).setOnClickListener(onClickCaptor.capture())
+
         val profileResponse = buildProfileResponseWithOrders()
         val profileResponseCall = SuccessCallFake<ProfileResponse>(Response.success(profileResponse))
 
-        whenever(burritosToGoApi.getProfile(anyString())).thenReturn(profileResponseCall)
+        whenever(profileApi.getProfile(anyString())).thenReturn(profileResponseCall)
         whenever(ordersAdapterFactory.make(
                 mainActivity, android.R.layout.simple_list_item_1,
                 listOf(profileResponse.orderHistory[0].description))).thenReturn(ordersAdapter)
 
-        subject.onResume(mainActivity)
+        onClickCaptor.value.onClick(null)
 
         verify(foundOrdersBlock).setVisibility(View.VISIBLE)
         verify(noOrdersBlock).setVisibility(View.GONE)

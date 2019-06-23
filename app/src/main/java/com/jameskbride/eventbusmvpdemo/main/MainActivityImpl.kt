@@ -2,12 +2,9 @@ package com.jameskbride.eventbusmvpdemo.main
 
 import android.os.Bundle
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.ListView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.jameskbride.eventbusmvpdemo.R
-import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
+import com.jameskbride.eventbusmvpdemo.network.ProfileApi
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import com.jameskbride.eventbusmvpdemo.utils.ToasterWrapper
@@ -17,18 +14,26 @@ import retrofit2.Response
 import javax.inject.Inject
 
 class MainActivityImpl @Inject constructor(
-        val burritosToGoApi: BurritosToGoApi,
+        val profileApi: ProfileApi,
         val toasterWrapper: ToasterWrapper = ToasterWrapper(),
         val ordersAdapterFactory:OrdersAdapterFactory = OrdersAdapterFactory()) {
 
     fun onCreate(savedInstanceState: Bundle?, mainActivity: MainActivity) {
         mainActivity.setContentView(R.layout.activity_main)
+
+        mainActivity.findViewById<Button>(R.id.submit).setOnClickListener { view: View? ->
+            val profileIdEdit = mainActivity.findViewById<EditText>(R.id.profile_id_edit)
+            getProfile(mainActivity, profileIdEdit.text.toString())
+        }
     }
 
     fun onResume(mainActivity: MainActivity) {
-        val call:Call<ProfileResponse>  = burritosToGoApi.getProfile("1")
+    }
 
-        call.enqueue(object: Callback<ProfileResponse> {
+    private fun getProfile(mainActivity: MainActivity, profileId: String) {
+        val call: Call<ProfileResponse> = profileApi.getProfile(profileId)
+
+        call.enqueue(object : Callback<ProfileResponse> {
             override fun onFailure(call: Call<ProfileResponse>?, t: Throwable?) {
                 toasterWrapper.makeText(mainActivity, R.string.oops, Toast.LENGTH_LONG).show()
             }

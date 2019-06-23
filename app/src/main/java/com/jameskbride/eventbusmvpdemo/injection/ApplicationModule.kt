@@ -2,7 +2,7 @@ package com.jameskbride.eventbusmvpdemo.injection
 
 import com.jameskbride.eventbusmvpdemo.BuildConfig
 import com.jameskbride.eventbusmvpdemo.main.MainActivityImpl
-import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
+import com.jameskbride.eventbusmvpdemo.network.ProfileApi
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -39,12 +39,12 @@ class ApplicationModule {
 
     @Provides
     @Singleton
-    fun makeBurritosToGoApi(retrofit: Retrofit): BurritosToGoApi {
-        return retrofit.create(BurritosToGoApi::class.java)
+    fun makeProfileApi(retrofit: Retrofit): ProfileApi {
+        return retrofit.create(ProfileApi::class.java)
     }
 
     @Provides
-    fun makeMainActivityImpl(burritosToGoApi: BurritosToGoApi): MainActivityImpl {
+    fun makeMainActivityImpl(burritosToGoApi: ProfileApi): MainActivityImpl {
         return MainActivityImpl(burritosToGoApi)
     }
 }
