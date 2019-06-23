@@ -44,7 +44,7 @@ class ApplicationModule {
     }
 
     @Provides
-    fun makeMainActivityImpl(burritosToGoApi: ProfileApi): MainActivityImpl {
-        return MainActivityImpl(burritosToGoApi)
+    fun makeMainActivityImpl(profileApi: ProfileApi): MainActivityImpl {
+        return MainActivityImpl(profileApi)
     }
 }
