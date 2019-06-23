@@ -42,7 +42,7 @@ class ApplicationModule {
 
     @Provides
     @Singleton
-    fun makeBurritosToGoApi(retrofit: Retrofit): ProfileApi {
+    fun makeProfileApi(retrofit: Retrofit): ProfileApi {
         return retrofit.create(ProfileApi::class.java)
     }
 
@@ -54,7 +54,7 @@ class ApplicationModule {
 
     @Provides
     @Singleton
-    fun makeBurritosToGoService(eventBus: EventBus, burritosToGoApi: ProfileApi): ProfileService {
+    fun makeProfileService(eventBus: EventBus, burritosToGoApi: ProfileApi): ProfileService {
         return ProfileService(eventBus, burritosToGoApi)
     }
 
