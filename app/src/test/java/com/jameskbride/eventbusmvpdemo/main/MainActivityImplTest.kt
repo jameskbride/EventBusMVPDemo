@@ -1,21 +1,27 @@
 package com.jameskbride.eventbusmvpdemo.main
 
+import android.text.Editable
 import android.view.View
 import android.widget.*
 import com.jameskbride.eventbusmvpdemo.R
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import com.jameskbride.eventbusmvpdemo.utils.ToasterWrapper
+import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentCaptor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations.initMocks
 
 class MainActivityImplTest {
 
     @Mock private lateinit var mainActivity:MainActivity
+    @Mock private lateinit var profileIdEditText: EditText
+    @Mock private lateinit var editable: Editable
+    @Mock private lateinit var submitButton: Button
     @Mock private lateinit var presenter:MainActivityPresenter
     @Mock private lateinit var toasterWrapper:ToasterWrapper
     @Mock private lateinit var customerName:TextView
@@ -38,6 +44,9 @@ class MainActivityImplTest {
 
         subject = MainActivityImpl(presenter, toasterWrapper, ordersAdapterFactory)
 
+        whenever(mainActivity.findViewById<EditText>(R.id.profile_id_edit)).thenReturn(profileIdEditText)
+        whenever(profileIdEditText.getText()).thenReturn(editable)
+        whenever(mainActivity.findViewById<Button>(R.id.submit)).thenReturn(submitButton)
         whenever(mainActivity.findViewById<TextView>(R.id.customer_name)).thenReturn(customerName)
         whenever(mainActivity.findViewById<TextView>(R.id.address_line_1)).thenReturn(addressLine1)
         whenever(mainActivity.findViewById<TextView>(R.id.address_line_2)).thenReturn(addressLine2)
@@ -57,6 +66,19 @@ class MainActivityImplTest {
     }
 
     @Test
+    fun onCreateConfiguresTheSubmitButton() {
+        whenever(editable.toString()).thenReturn("2")
+        subject.onCreate(null, mainActivity)
+        val onClickCaptor = ArgumentCaptor.forClass(View.OnClickListener::class.java)
+
+        verify(submitButton, atLeastOnce()).setOnClickListener(onClickCaptor.capture())
+
+        onClickCaptor.value.onClick(null)
+
+        verify(presenter).getProfile("2")
+    }
+
+    @Test
     fun itCanDisplayAnErrorMessage() {
         whenever(toasterWrapper.makeText(mainActivity, R.string.oops, Toast.LENGTH_LONG)).thenReturn(toasterWrapper)
 
@@ -71,13 +93,6 @@ class MainActivityImplTest {
         subject.onResume()
 
         verify(presenter).open()
-    }
-
-    @Test
-    fun onResumeRequestsTheProfile() {
-        subject.onResume()
-
-        verify(presenter).getProfile("1")
     }
 
     @Test
