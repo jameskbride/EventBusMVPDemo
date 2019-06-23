@@ -10,7 +10,7 @@ class EventBusMVPDemoApplication constructor(
         val applicationComponentFactory:ApplicationComponentFactory = ApplicationComponentFactory()): Application() {
 
     @Inject
-    lateinit var burritosToGoService:ProfileService
+    lateinit var profileService:ProfileService
 
     override fun onCreate() {
         super.onCreate()
@@ -18,7 +18,7 @@ class EventBusMVPDemoApplication constructor(
         applicationComponent = applicationComponentFactory.build()
         applicationComponent.inject(this)
 
-        burritosToGoService.open()
+        profileService.open()
 
     }
 
