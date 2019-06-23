@@ -19,6 +19,6 @@ class ProfilePageTest {
 
     @Test
     fun whenTheViewLoadsItDisplaysTheSearchView() {
-        onView(withId(R.id.profile_id_edit)).check(matches(isDisplayed()));
+        onView(withId(R.id.profile_id_edit)).check(matches(isDisplayed()))
     }
 }
