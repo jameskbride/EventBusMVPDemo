@@ -3,8 +3,8 @@ package com.jameskbride.eventbusmvpdemo.injection
 import com.jameskbride.eventbusmvpdemo.BuildConfig
 import com.jameskbride.eventbusmvpdemo.main.MainActivityImpl
 import com.jameskbride.eventbusmvpdemo.main.MainActivityPresenter
-import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
-import com.jameskbride.eventbusmvpdemo.network.service.BurritosToGoService
+import com.jameskbride.eventbusmvpdemo.network.ProfileApi
+import com.jameskbride.eventbusmvpdemo.network.service.ProfileService
 import dagger.Module
 import dagger.Provides
 import io.reactivex.Scheduler
@@ -57,8 +57,8 @@ class ApplicationModule {
 
     @Provides
     @Singleton
-    fun makeBurritosToGoApi(retrofit: Retrofit): BurritosToGoApi {
-        return retrofit.create(BurritosToGoApi::class.java)
+    fun makeBurritosToGoApi(retrofit: Retrofit): ProfileApi {
+        return retrofit.create(ProfileApi::class.java)
     }
 
     @Provides
@@ -85,10 +85,10 @@ class ApplicationModule {
     @Singleton
     fun makeBurritosToGoService(
             eventBus: EventBus,
-            burritosToGoApi: BurritosToGoApi,
+            burritosToGoApi: ProfileApi,
             @Named("process") processScheduler: Scheduler,
-            @Named("main") androidScheduler: Scheduler): BurritosToGoService {
-        return BurritosToGoService(eventBus, burritosToGoApi, processScheduler, androidScheduler)
+            @Named("main") androidScheduler: Scheduler): ProfileService {
+        return ProfileService(eventBus, burritosToGoApi, processScheduler, androidScheduler)
     }
 
     @Provides

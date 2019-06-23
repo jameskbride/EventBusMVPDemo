@@ -1,8 +1,9 @@
 package com.jameskbride.eventbusmvpdemo.main
 
-import android.support.v4.app.FragmentManager
+import android.text.Editable
 import android.view.View
 import android.widget.*
+import androidx.fragment.app.FragmentManager
 import com.jameskbride.eventbusmvpdemo.R
 import com.jameskbride.eventbusmvpdemo.bus.NetworkErrorEvent
 import com.jameskbride.eventbusmvpdemo.bus.NetworkRequestEvent
@@ -13,20 +14,15 @@ import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import com.jameskbride.eventbusmvpdemo.security.SecurityErrorViewFactory
 import com.jameskbride.eventbusmvpdemo.security.SecurityErrorViewFragment
 import com.jameskbride.eventbusmvpdemo.utils.ToasterWrapper
+import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentCaptor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations.initMocks
-import android.R.attr.editable
-import android.text.Editable
-import android.widget.EditText
-import android.R.attr.onClick
-import org.mockito.ArgumentCaptor
-import android.R.attr.editable
-import com.nhaarman.mockito_kotlin.atLeastOnce
 
 
 class MainActivityImplTest {
@@ -52,7 +48,7 @@ class MainActivityImplTest {
     @Mock private lateinit var securityErrorViewFactory:SecurityErrorViewFactory
     @Mock private lateinit var networkErrorViewFragment:NetworkErrorViewFragment
     @Mock private lateinit var securityErrorViewFragment:SecurityErrorViewFragment
-    @Mock private lateinit var fragmentManager:FragmentManager
+    @Mock private lateinit var fragmentManager: FragmentManager
 
     private lateinit var subject:MainActivityImpl
 
@@ -112,13 +108,6 @@ class MainActivityImplTest {
         subject.onResume()
 
         verify(presenter).open()
-    }
-
-    @Test
-    fun onResumeRequestsTheProfile() {
-        subject.onResume()
-
-        verify(presenter).getProfile("1")
     }
 
     @Test
