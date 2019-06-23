@@ -2,7 +2,7 @@ package com.jameskbride.eventbusmvpdemo.network.service
 
 import com.google.gson.Gson
 import com.jameskbride.eventbusmvpdemo.bus.*
-import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
+import com.jameskbride.eventbusmvpdemo.network.ProfileApi
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import com.nhaarman.mockito_kotlin.whenever
@@ -25,9 +25,9 @@ import java.io.IOException
 
 class BurritosToGoServiceTest {
 
-    @Mock private lateinit var burritosToGoApi:BurritosToGoApi
+    @Mock private lateinit var burritosToGoApi:ProfileApi
 
-    private lateinit var subject:BurritosToGoService
+    private lateinit var subject:ProfileService
 
     private lateinit var eventBus:EventBus
     private lateinit var testScheduler:TestScheduler
@@ -43,7 +43,7 @@ class BurritosToGoServiceTest {
         eventBus = EventBus.getDefault()
         testScheduler = TestScheduler()
 
-        subject = BurritosToGoService(eventBus, burritosToGoApi, testScheduler, testScheduler)
+        subject = ProfileService(eventBus, burritosToGoApi, testScheduler, testScheduler)
 
         eventBus.register(this)
         subject.open()

@@ -4,7 +4,7 @@ import com.jameskbride.eventbusmvpdemo.bus.BusAware
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileResponseEvent
-import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
+import com.jameskbride.eventbusmvpdemo.network.ProfileApi
 import com.jameskbride.eventbusmvpdemo.network.NetworkApiWrapper
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import com.jameskbride.eventbusmvpdemo.network.SecurityApiWrapper
@@ -15,9 +15,9 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import javax.inject.Inject
 
-class BurritosToGoService @Inject constructor(
+class ProfileService @Inject constructor(
         override val eventBus: EventBus,
-        val burritosToGoApi: BurritosToGoApi,
+        val burritosToGoApi: ProfileApi,
         val processScheduler: Scheduler,
         val androidScheduler: Scheduler): BusAware {
 
