@@ -54,8 +54,8 @@ class ApplicationModule {
 
     @Provides
     @Singleton
-    fun makeProfileService(eventBus: EventBus, burritosToGoApi: ProfileApi): ProfileService {
-        return ProfileService(eventBus, burritosToGoApi)
+    fun makeProfileService(eventBus: EventBus, profileApi: ProfileApi): ProfileService {
+        return ProfileService(eventBus, profileApi)
     }
 
     @Provides
