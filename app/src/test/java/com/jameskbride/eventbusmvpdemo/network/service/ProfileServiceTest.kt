@@ -5,7 +5,7 @@ import com.jameskbride.eventbusmvpdemo.SuccessCallFake
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileResponseEvent
-import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
+import com.jameskbride.eventbusmvpdemo.network.ProfileApi
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import com.nhaarman.mockito_kotlin.whenever
@@ -21,11 +21,11 @@ import org.mockito.MockitoAnnotations.initMocks
 import retrofit2.Response
 import java.io.IOException
 
-class BurritosToGoServiceTest {
+class ProfileServiceTest {
 
-    @Mock private lateinit var burritosToGoApi:BurritosToGoApi
+    @Mock private lateinit var profileApi:ProfileApi
 
-    private lateinit var subject:BurritosToGoService
+    private lateinit var subject:ProfileService
 
     private lateinit var eventBus:EventBus
 
@@ -37,7 +37,7 @@ class BurritosToGoServiceTest {
         initMocks(this)
         eventBus = EventBus.getDefault()
 
-        subject = BurritosToGoService(eventBus, burritosToGoApi)
+        subject = ProfileService(eventBus, profileApi)
 
         eventBus.register(this)
         subject.open()
@@ -52,7 +52,7 @@ class BurritosToGoServiceTest {
     @Test
     fun itRegistersForGetProfileEvent() {
         val profileResponseCall = FailureCallFake<ProfileResponse>(IOException("parse exception"))
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall)
+        whenever(profileApi.getProfile("1")).thenReturn(profileResponseCall)
 
         eventBus.post(GetProfileEvent("1"))
 
@@ -62,7 +62,7 @@ class BurritosToGoServiceTest {
     @Test
     fun onGetProfileEventEmitsGetProfileErrorWhenAFailureOccurs() {
         val profileResponseCall = FailureCallFake<ProfileResponse>(IOException("parse exception"))
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall)
+        whenever(profileApi.getProfile("1")).thenReturn(profileResponseCall)
 
         subject.onGetProfileEvent(GetProfileEvent("1"))
 
@@ -73,7 +73,7 @@ class BurritosToGoServiceTest {
     fun onGetProfileEventEmitsGetProfileResponseEventWhenAResponseIsReceived() {
         val profileResponse = buildProfileResponseWithOrders()
         val profileResponseCall = SuccessCallFake<ProfileResponse>(Response.success(profileResponse))
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(profileResponseCall)
+        whenever(profileApi.getProfile("1")).thenReturn(profileResponseCall)
 
         subject.onGetProfileEvent(GetProfileEvent("1"))
 

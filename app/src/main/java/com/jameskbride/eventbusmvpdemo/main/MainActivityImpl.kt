@@ -2,10 +2,7 @@ package com.jameskbride.eventbusmvpdemo.main
 
 import android.os.Bundle
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.ListView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.jameskbride.eventbusmvpdemo.R
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
@@ -23,11 +20,15 @@ class MainActivityImpl @Inject constructor(
         this.mainActivity = mainActivity
         mainActivity.setContentView(R.layout.activity_main)
         presenter.view = this
+
+        mainActivity.findViewById<Button>(R.id.submit).setOnClickListener { view: View? ->
+            val profileIdEdit = mainActivity.findViewById<EditText>(R.id.profile_id_edit)
+            presenter.getProfile(profileIdEdit.text.toString())
+        }
     }
 
     fun onResume() {
         presenter.open()
-        presenter.getProfile("1")
     }
 
     override fun displayError(message: Int) {

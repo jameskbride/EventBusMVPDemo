@@ -4,7 +4,7 @@ import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileEvent
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileResponseEvent
 import com.jameskbride.eventbusmvpdemo.bus.BusAware
-import com.jameskbride.eventbusmvpdemo.network.BurritosToGoApi
+import com.jameskbride.eventbusmvpdemo.network.ProfileApi
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -13,11 +13,11 @@ import retrofit2.Callback
 import retrofit2.Response
 import javax.inject.Inject
 
-class BurritosToGoService @Inject constructor(override val eventBus: EventBus, val burritosToGoApi: BurritosToGoApi): BusAware {
+class ProfileService @Inject constructor(override val eventBus: EventBus, val profileApi: ProfileApi): BusAware {
 
     @Subscribe
     fun onGetProfileEvent(getProfileEvent: GetProfileEvent) {
-        val call: Call<ProfileResponse> = burritosToGoApi.getProfile(getProfileEvent.id)
+        val call: Call<ProfileResponse> = profileApi.getProfile(getProfileEvent.id)
         call.enqueue(object:Callback<ProfileResponse> {
             override fun onFailure(call: Call<ProfileResponse>?, t: Throwable?) {
                 eventBus.post(GetProfileErrorEvent())
