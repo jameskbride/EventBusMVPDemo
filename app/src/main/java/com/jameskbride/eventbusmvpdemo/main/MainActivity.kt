@@ -1,7 +1,7 @@
 package com.jameskbride.eventbusmvpdemo.main
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.jameskbride.eventbusmvpdemo.EventBusMVPDemoApplication
 import javax.inject.Inject
 

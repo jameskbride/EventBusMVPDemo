@@ -1,8 +1,8 @@
 package com.jameskbride.eventbusmvpdemo.utils
 
 import android.content.Context
-import android.support.annotation.StringRes
 import android.widget.Toast
+import androidx.annotation.StringRes
 
 class ToasterWrapper {
 
