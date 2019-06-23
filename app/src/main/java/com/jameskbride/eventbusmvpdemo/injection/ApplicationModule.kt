@@ -40,7 +40,7 @@ class ApplicationModule {
 
     @Provides
     @Singleton
-    fun makeBurritosToGoApi(retrofit: Retrofit): ProfileApi {
+    fun makeProfileApi(retrofit: Retrofit): ProfileApi {
         return retrofit.create(ProfileApi::class.java)
     }
 
