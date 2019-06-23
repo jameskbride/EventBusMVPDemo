@@ -1,6 +1,8 @@
 package com.jameskbride.eventbusmvpdemo
 
+import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
+import android.support.test.espresso.action.ViewActions
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.action.ViewActions.typeText
 import android.support.test.espresso.assertion.ViewAssertions.matches
@@ -34,5 +36,17 @@ class ProfilePageTest {
         onView(withText("Albuquerque")).check(matches(isDisplayed()))
         onView(withText("NM")).check(matches(isDisplayed()))
         onView(withText("87101")).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun givenAGoodProfileIdItDisplaysTheOrders() {
+        onView(withId(R.id.profile_id_edit)).perform(typeText("1"))
+
+        onView(withId(R.id.submit)).perform(click())
+        Espresso.closeSoftKeyboard()
+
+        onView(withText("Large Pizza")).perform(ViewActions.scrollTo()).check(matches(isDisplayed()))
+        onView(withText("Industrial size beaker")).check(matches(isDisplayed()))
+        onView(withText("Barrel of Methylamine")).perform(ViewActions.scrollTo()).check(matches(isDisplayed()))
     }
 }
