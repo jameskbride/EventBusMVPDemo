@@ -1,8 +1,9 @@
 package com.jameskbride.eventbusmvpdemo.main
 
-import android.support.v4.app.FragmentManager
+import android.text.Editable
 import android.view.View
 import android.widget.*
+import androidx.fragment.app.FragmentManager
 import com.jameskbride.eventbusmvpdemo.R
 import com.jameskbride.eventbusmvpdemo.bus.NetworkErrorEvent
 import com.jameskbride.eventbusmvpdemo.bus.NetworkRequestEvent
@@ -11,12 +12,13 @@ import com.jameskbride.eventbusmvpdemo.network.NetworkErrorViewFragment
 import com.jameskbride.eventbusmvpdemo.network.Order
 import com.jameskbride.eventbusmvpdemo.network.ProfileResponse
 import com.jameskbride.eventbusmvpdemo.utils.ToasterWrapper
+import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyString
+import org.mockito.ArgumentCaptor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations.initMocks
 
@@ -26,6 +28,9 @@ class MainActivityImplTest {
     @Mock private lateinit var mainActivity:MainActivity
     @Mock private lateinit var presenter:MainActivityPresenter
     @Mock private lateinit var toasterWrapper:ToasterWrapper
+    @Mock private lateinit var profileTextEdit:EditText
+    @Mock private lateinit var editable: Editable
+    @Mock private lateinit var submitButton:Button
     @Mock private lateinit var customerName:TextView
     @Mock private lateinit var addressLine1:TextView
     @Mock private lateinit var addressLine2:TextView
@@ -39,7 +44,7 @@ class MainActivityImplTest {
     @Mock private lateinit var ordersAdapterFactory:OrdersAdapterFactory
     @Mock private lateinit var networkErrorViewFactory:NetworkErrorViewFactory
     @Mock private lateinit var networkErrorViewFragment:NetworkErrorViewFragment
-    @Mock private lateinit var fragmentManager:FragmentManager
+    @Mock private lateinit var fragmentManager: FragmentManager
 
     private lateinit var subject:MainActivityImpl
 
@@ -49,6 +54,9 @@ class MainActivityImplTest {
 
         subject = MainActivityImpl(presenter, toasterWrapper, ordersAdapterFactory, networkErrorViewFactory)
 
+        whenever(mainActivity.findViewById<TextView>(R.id.profile_id_edit)).thenReturn(profileTextEdit)
+        whenever(profileTextEdit.getText()).thenReturn(editable)
+        whenever(mainActivity.findViewById<TextView>(R.id.submit)).thenReturn(submitButton)
         whenever(mainActivity.findViewById<TextView>(R.id.customer_name)).thenReturn(customerName)
         whenever(mainActivity.findViewById<TextView>(R.id.address_line_1)).thenReturn(addressLine1)
         whenever(mainActivity.findViewById<TextView>(R.id.address_line_2)).thenReturn(addressLine2)
@@ -69,6 +77,19 @@ class MainActivityImplTest {
     }
 
     @Test
+    fun onCreateConfiguresTheSubmitButton() {
+        whenever(editable.toString()).thenReturn("2")
+        subject.onCreate(null, mainActivity)
+        val onClickCaptor = ArgumentCaptor.forClass(View.OnClickListener::class.java)
+
+        verify(submitButton, atLeastOnce()).setOnClickListener(onClickCaptor.capture())
+
+        onClickCaptor.value.onClick(null)
+
+        verify(presenter).getProfile("2")
+    }
+
+    @Test
     fun itCanDisplayAnErrorMessage() {
         whenever(toasterWrapper.makeText(mainActivity, R.string.oops, Toast.LENGTH_LONG)).thenReturn(toasterWrapper)
 
@@ -83,13 +104,6 @@ class MainActivityImplTest {
         subject.onResume()
 
         verify(presenter).open()
-    }
-
-    @Test
-    fun onResumeRequestsTheProfile() {
-        subject.onResume()
-
-        verify(presenter).getProfile("1")
     }
 
     @Test

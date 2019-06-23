@@ -1,6 +1,6 @@
 package com.jameskbride.eventbusmvpdemo.main
 
-import android.support.annotation.StringRes
+import androidx.annotation.StringRes
 import com.jameskbride.eventbusmvpdemo.R
 import com.jameskbride.eventbusmvpdemo.bus.BusAware
 import com.jameskbride.eventbusmvpdemo.bus.GetProfileErrorEvent

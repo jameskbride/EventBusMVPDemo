@@ -19,8 +19,8 @@ class NetworkErrorViewFragmentImpl @Inject constructor(val presenter: NetworkErr
         val view = inflater!!.inflate(R.layout.network_error, container)
         presenter.view = this
 
-        view.findViewById<Button>(R.id.retry_button).setOnClickListener {view: View? ->
-            val networkRequestEvent = networkErrorViewFragment.arguments.getSerializable(NETWORK_REQUEST) as NetworkRequestEvent
+        view.findViewById<Button>(R.id.retry_button).setOnClickListener {
+            val networkRequestEvent = networkErrorViewFragment.arguments?.getSerializable(NETWORK_REQUEST) as NetworkRequestEvent
             presenter.retry(networkRequestEvent)
         }
 
