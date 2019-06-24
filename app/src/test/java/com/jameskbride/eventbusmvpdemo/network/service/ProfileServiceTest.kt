@@ -23,9 +23,9 @@ import retrofit2.Response
 import java.io.IOException
 
 
-class BurritosToGoServiceTest {
+class ProfileServiceTest {
 
-    @Mock private lateinit var burritosToGoApi:ProfileApi
+    @Mock private lateinit var profileApi:ProfileApi
 
     private lateinit var subject:ProfileService
 
@@ -43,7 +43,7 @@ class BurritosToGoServiceTest {
         eventBus = EventBus.getDefault()
         testScheduler = TestScheduler()
 
-        subject = ProfileService(eventBus, burritosToGoApi, testScheduler, testScheduler)
+        subject = ProfileService(eventBus, profileApi, testScheduler, testScheduler)
 
         eventBus.register(this)
         subject.open()
@@ -58,7 +58,7 @@ class BurritosToGoServiceTest {
     @Test
     fun itRegistersForGetProfileEvent() {
         val profileResponse = buildProfileResponseWithOrders()
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(Observable.just(profileResponse))
+        whenever(profileApi.getProfile("1")).thenReturn(Observable.just(profileResponse))
         eventBus.post(GetProfileEvent("1"))
         testScheduler.triggerActions()
 
@@ -71,7 +71,7 @@ class BurritosToGoServiceTest {
         gson.toJson(CustomError())
         val throwable = Response.error<ProfileResponse>(400, ResponseBody.create(MediaType.parse("application/json"), gson.toString()))
         val exception = HttpException(throwable)
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(Observable.error<ProfileResponse>(exception))
+        whenever(profileApi.getProfile("1")).thenReturn(Observable.error<ProfileResponse>(exception))
         subject.onGetProfileEvent(GetProfileEvent("1"))
         testScheduler.triggerActions()
 
@@ -82,7 +82,7 @@ class BurritosToGoServiceTest {
     fun onGetProfileEventEmitsGetProfileResponseEventWhenAResponseIsReceived() {
         val profileResponse = buildProfileResponseWithOrders()
         val observable = Observable.just(profileResponse)
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(observable)
+        whenever(profileApi.getProfile("1")).thenReturn(observable)
 
         subject.onGetProfileEvent(GetProfileEvent("1"))
         testScheduler.triggerActions()
@@ -93,7 +93,7 @@ class BurritosToGoServiceTest {
     @Test
     fun itPostsANetworkErrorEventWhenAnIOExceptionOccurs() {
         val throwable = IOException("parse exception")
-        whenever(burritosToGoApi.getProfile("1")).thenReturn(Observable.error<ProfileResponse>(throwable))
+        whenever(profileApi.getProfile("1")).thenReturn(Observable.error<ProfileResponse>(throwable))
 
         eventBus.post(GetProfileEvent("1"))
         testScheduler.triggerActions()
@@ -104,7 +104,7 @@ class BurritosToGoServiceTest {
     @Test
     fun itPostsASecurityErrorWhenAnUnauthorizedResponseOccurs() {
         val httpException = HttpException(Response.error<Any>(401, ResponseBody.create(MediaType.parse("application/json"), "")))
-        whenever(burritosToGoApi.getProfile("2")).thenReturn(Observable.error<ProfileResponse>(httpException))
+        whenever(profileApi.getProfile("2")).thenReturn(Observable.error<ProfileResponse>(httpException))
 
         eventBus.post(GetProfileEvent("2"))
         testScheduler.triggerActions()

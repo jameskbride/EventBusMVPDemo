@@ -17,13 +17,13 @@ import javax.inject.Inject
 
 class ProfileService @Inject constructor(
         override val eventBus: EventBus,
-        val burritosToGoApi: ProfileApi,
+        val profileApi: ProfileApi,
         val processScheduler: Scheduler,
         val androidScheduler: Scheduler): BusAware {
 
     @Subscribe
     fun onGetProfileEvent(getProfileEvent: GetProfileEvent) {
-        val call: Observable<ProfileResponse> = burritosToGoApi.getProfile(getProfileEvent.id)
+        val call: Observable<ProfileResponse> = profileApi.getProfile(getProfileEvent.id)
         val getProfileConsumer = Consumer<ProfileResponse> { result -> eventBus.post(GetProfileResponseEvent(result)) }
         val getProfileErrorConsumer = Consumer<Throwable>{ error: Throwable -> eventBus.post(GetProfileErrorEvent()) }
         val securityApiWrapper = SecurityApiWrapper(eventBus, getProfileErrorConsumer)
